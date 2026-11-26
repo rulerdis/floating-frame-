@@ -259,29 +259,27 @@
       <!-- Толщина стенки профиля -->
       <div>
         <div class="flex items-center justify-between mb-1.5">
-          <label for="profile-thickness" class="text-xs text-hint">Толщина стенки профиля (лицевая грань)</label>
+          <span class="text-xs text-hint">Толщина стенки профиля (лицевая грань)</span>
           <span class="text-xs font-semibold text-wood-accent" id="profile-label">15 мм</span>
         </div>
-        <div class="grid grid-cols-4 gap-2">
+        <div class="grid grid-cols-3 gap-2">
           <button type="button" data-profile="10" class="preset-profile selectable-item py-2 rounded-xl text-xs font-semibold">10 мм</button>
           <button type="button" data-profile="15" class="preset-profile selectable-item is-selected py-2 rounded-xl text-xs font-semibold">15 мм</button>
-          <button type="button" data-profile="20" class="preset-profile selectable-item py-2 rounded-xl text-xs font-semibold">20 мм</button>
-          <input id="profile-thickness" type="number" inputmode="numeric" min="8" max="40" value="15" aria-label="Своя толщина стенки профиля в мм"
-            class="w-full rounded-xl border px-2 py-1.5 text-center text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-wood-500" />
+          <button type="button" data-profile="20" class="preset-profile selectable-item py-2 rounded-xl text-xs font-semibold">20 мм (+20%)</button>
         </div>
       </div>
 
       <!-- Технологический зазор (минимум 3 мм) -->
       <div>
         <div class="flex items-center justify-between mb-1.5">
-          <label for="gap-size" class="text-xs text-hint">Зазор между рамой и основой (от 3 мм)</label>
+          <label for="gap-size" class="text-xs text-hint">Зазор между рамой и основой (3–20 мм)</label>
           <span class="text-xs font-semibold text-wood-accent" id="gap-label">10 мм</span>
         </div>
         <div class="grid grid-cols-4 gap-2">
           <button type="button" data-gap="3" class="preset-gap selectable-item py-2 rounded-xl text-xs font-semibold">3 мм</button>
           <button type="button" data-gap="5" class="preset-gap selectable-item py-2 rounded-xl text-xs font-semibold">5 мм</button>
           <button type="button" data-gap="10" class="preset-gap selectable-item is-selected py-2 rounded-xl text-xs font-semibold">10 мм</button>
-          <input id="gap-size" type="number" inputmode="numeric" min="3" max="30" value="10" aria-label="Свой зазор в мм"
+          <input id="gap-size" type="number" inputmode="numeric" min="3" max="20" value="10" aria-label="Свой зазор в мм"
             class="w-full rounded-xl border px-2 py-1.5 text-center text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-wood-500" />
         </div>
 
@@ -564,6 +562,7 @@
       STANDARD_DEPTH_MM: 40,
       MAX_STANDARD_SAW_MM: 55,
       MIN_GAP_MM: 3,
+      MAX_GAP_MM: 20,
       MIN_BASE_THICK_MM: 15,
       HANGERS_PRICE: 150,
       HANGERS_BOTH_SURCHARGE: 50
@@ -805,8 +804,11 @@
         isCustomOnly = true;
       }
 
+      const profileMultiplier = calc.profileMm >= 20 ? 1.20 : 1.0;
+      const profileSurchargePercent = calc.profileMm >= 20 ? 20 : 0;
+
       const woodInfo = CONFIG.WOOD_TYPES[state.wood];
-      const rawFrameCost = perimeter * woodInfo.price * depthMultiplier;
+      const rawFrameCost = perimeter * woodInfo.price * depthMultiplier * profileMultiplier;
       const frameCost = Math.ceil(rawFrameCost / 10) * 10;
       const hangersCost = state.hasHangers
         ? CONFIG.HANGERS_PRICE + (state.orientation === 'both' ? CONFIG.HANGERS_BOTH_SURCHARGE : 0)
@@ -826,6 +828,7 @@
         reqDepth,
         boardHeight,
         surchargePercent,
+        profileSurchargePercent,
         isCustomOnly,
         woodInfo,
         frameCost,
@@ -1044,8 +1047,12 @@
         document.getElementById('wood-rate-summary').textContent = `${calc.woodInfo.name} · ${formatNumber(calc.woodInfo.price)} ₽/м.п.`;
         document.getElementById('depth-summary').textContent = `Профиль ${calc.boardHeight} мм`;
 
-        if (calc.surchargePercent > 0) {
-          surchargeBadge.textContent = `+${calc.surchargePercent}% за глубину`;
+        const badges = [];
+        if (calc.profileSurchargePercent > 0) badges.push(`+${calc.profileSurchargePercent}% за профиль 20 мм`);
+        if (calc.surchargePercent > 0) badges.push(`+${calc.surchargePercent}% за глубину`);
+
+        if (badges.length > 0) {
+          surchargeBadge.textContent = badges.join(' · ');
           surchargeBadge.classList.remove('hidden');
         } else {
           surchargeBadge.classList.add('hidden');
@@ -1104,7 +1111,7 @@
         ``,
         `🖼 Размер основы для картины: ${fmtDim(calc.widthCm)} × ${fmtDim(calc.heightCm)} см (толщина ${calc.baseMm} мм)`,
         `🪵 Порода дерева: ${calc.woodInfo.name} (${formatNumber(calc.woodInfo.price)} ₽/м.п.)`,
-        `📐 Стенка профиля: ${calc.profileMm} мм | Зазор: ${calc.gapMm} мм`,
+        `📐 Стенка профиля: ${calc.profileMm} мм${calc.profileSurchargePercent > 0 ? ` (+${calc.profileSurchargePercent}%)` : ''} | Зазор: ${calc.gapMm} мм`,
         `📏 Внешний габарит рамы: ${fmtDim(calc.extW)} × ${fmtDim(calc.extH)} см (${calc.perimeter.toFixed(2)} м.п.)`,
         `📥 Посадка: ${fitText} (высота борта ${calc.boardHeight} мм)`,
         hangersLine,
@@ -1218,30 +1225,14 @@
         });
       });
 
-      const profileInput = document.getElementById('profile-thickness');
       document.querySelectorAll('.preset-profile').forEach((btn) => {
         btn.addEventListener('click', (e) => {
           e.preventDefault();
           const val = Number(btn.getAttribute('data-profile'));
-          state.profileThicknessMm = val;
-          profileInput.value = val;
-          syncSelectableGroup('.preset-profile', 'data-profile', val);
+          state.profileThicknessMm = [10, 15, 20].includes(val) ? val : 15;
+          syncSelectableGroup('.preset-profile', 'data-profile', state.profileThicknessMm);
           render();
         });
-      });
-      profileInput.addEventListener('input', (e) => {
-        const raw = parseFloat(e.target.value);
-        state.profileThicknessMm = isNaN(raw) ? 8 : Math.min(40, Math.max(8, raw));
-        syncSelectableGroup('.preset-profile', 'data-profile', state.profileThicknessMm);
-        render();
-      });
-      profileInput.addEventListener('blur', (e) => {
-        const raw = parseFloat(e.target.value);
-        const clamped = isNaN(raw) ? 15 : Math.min(40, Math.max(8, raw));
-        state.profileThicknessMm = clamped;
-        e.target.value = clamped;
-        syncSelectableGroup('.preset-profile', 'data-profile', clamped);
-        render();
       });
 
       const gapInput = document.getElementById('gap-size');
@@ -1261,15 +1252,19 @@
           state.gapMm = CONFIG.MIN_GAP_MM;
           e.target.value = CONFIG.MIN_GAP_MM;
           showToast('Минимальный технологический зазор — 3 мм');
+        } else if (!isNaN(raw) && raw > CONFIG.MAX_GAP_MM) {
+          state.gapMm = CONFIG.MAX_GAP_MM;
+          e.target.value = CONFIG.MAX_GAP_MM;
+          showToast('Максимальный зазор — 20 мм');
         } else {
-          state.gapMm = isNaN(raw) ? CONFIG.MIN_GAP_MM : Math.min(30, Math.max(CONFIG.MIN_GAP_MM, raw));
+          state.gapMm = isNaN(raw) ? CONFIG.MIN_GAP_MM : Math.min(CONFIG.MAX_GAP_MM, Math.max(CONFIG.MIN_GAP_MM, raw));
         }
         syncSelectableGroup('.preset-gap', 'data-gap', state.gapMm);
         render();
       });
       gapInput.addEventListener('blur', (e) => {
         const raw = parseFloat(e.target.value);
-        const clamped = isNaN(raw) ? CONFIG.MIN_GAP_MM : Math.min(30, Math.max(CONFIG.MIN_GAP_MM, raw));
+        const clamped = isNaN(raw) ? CONFIG.MIN_GAP_MM : Math.min(CONFIG.MAX_GAP_MM, Math.max(CONFIG.MIN_GAP_MM, raw));
         state.gapMm = clamped;
         e.target.value = clamped;
         syncSelectableGroup('.preset-gap', 'data-gap', clamped);
