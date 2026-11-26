@@ -13,6 +13,50 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
+
+  <!-- Модальное окно: Политика конфиденциальности -->
+  <div id="privacy-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+    <div class="card-surface w-full max-w-lg max-h-[85vh] rounded-2xl shadow-xl flex flex-col overflow-hidden">
+      <div class="flex items-center justify-between px-4 py-3.5 border-b border-stone-500/20">
+        <h3 class="text-sm font-bold">Политика конфиденциальности</h3>
+        <button id="privacy-close" type="button" aria-label="Закрыть" class="p-1.5 rounded-lg text-hint hover:opacity-80">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="p-4 overflow-y-auto space-y-3 text-xs leading-relaxed text-hint">
+        <p class="font-semibold" style="color: var(--tg-text);">1. Общие положения</p>
+        <p>Настоящая Политика конфиденциальности описывает, как обрабатываются данные при использовании веб-калькулятора и Telegram Mini App «Рамы кэнвэс (Canvas)» (далее — Калькулятор).</p>
+        <p>Оператор данных: Индивидуальный предприниматель Сухинин Денис Сергеевич, ИНН <span class="font-medium" style="color: var(--tg-text);">550411214396</span> (e-mail: <span class="font-medium" style="color: var(--tg-text);">deanan-torg@yandex.ru</span>, Telegram: <span class="font-medium" style="color: var(--tg-text);">@rulerdis</span>).</p>
+
+        <p class="font-semibold" style="color: var(--tg-text);">2. Какие данные фиксируются</p>
+        <p>Сам Калькулятор не запрашивает ФИО, номер телефона, почту или адрес доставки. При работе могут фиксироваться:</p>
+        <ul class="list-disc pl-5 space-y-1">
+          <li>технические параметры запуска и взаимодействия (тип платформы/устройства, факт открытия калькулятора, нажатие кнопок «Скопировать» и «Отправить мастеру»);</li>
+          <li>сформированный текст расчёта без контактных данных клиента;</li>
+          <li>данные профиля в Telegram (ID и username при запуске внутри Telegram) либо локальный анонимный идентификатор браузера, а также стандартные сетевые метаданные соединения (например, IP-адрес на стороне инфраструктуры).</li>
+        </ul>
+
+        <p class="font-semibold" style="color: var(--tg-text);">3. Цели использования данных</p>
+        <p>Данные используются исключительно для работы калькулятора, ведения обезличенной статистики спроса, улучшения интерфейса и расчётов, а также подготовки предварительного расчёта по запросу пользователя.</p>
+
+        <p class="font-semibold" style="color: var(--tg-text);">4. Хранение и передача</p>
+        <p>События использования передаются через вебхук для учёта статистики (в том числе в сервисы Google / таблицы учёта) и локально сохраняются в памяти браузера для устойчивости работы. Данные не продаются третьим лицам и не используются для навязчивых рассылок.</p>
+
+        <p class="font-semibold" style="color: var(--tg-text);">5. Предварительность расчёта и связь</p>
+        <p>Расчёт в Калькуляторе носит справочный и предварительный характер, не является публичной офертой и уточняется при личном обращении к мастеру. По вопросам, связанным с обработкой данных, можно написать на e-mail <span class="font-medium" style="color: var(--tg-text);">deanan-torg@yandex.ru</span> или в Telegram: <span class="font-medium" style="color: var(--tg-text);">@rulerdis</span>.</p>
+      </div>
+
+      <div class="px-4 py-3 border-t border-stone-500/20 flex justify-end">
+        <button id="privacy-ok" type="button" class="px-4 py-2 rounded-xl bg-wood-600 hover:bg-wood-700 text-white text-xs font-semibold">
+          Понятно
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -542,7 +586,12 @@
         <svg class="w-4 h-4 text-wood-accent shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <span>Рама поставляется без покраски (шлифованный массив, готовый под любое покрытие).</span>
+        <div class="space-y-1">
+          <p>Рама поставляется без покраски (шлифованный массив, готовый под любое покрытие). Расчёт предварительный, уточняется при заказе.</p>
+          <button id="btn-open-privacy" type="button" class="underline text-wood-accent hover:opacity-80 font-medium">
+            Политика конфиденциальности
+          </button>
+        </div>
       </div>
     </section>
 
@@ -1457,6 +1506,34 @@
         syncOrientationUI();
         render();
       });
+
+      const privacyModal = document.getElementById('privacy-modal');
+      const btnOpenPrivacy = document.getElementById('btn-open-privacy');
+      const btnClosePrivacy = document.getElementById('privacy-close');
+      const btnOkPrivacy = document.getElementById('privacy-ok');
+
+      function openPrivacyModal(e) {
+        if (e) e.preventDefault();
+        if (!privacyModal) return;
+        privacyModal.classList.remove('hidden');
+        privacyModal.classList.add('flex');
+      }
+
+      function closePrivacyModal(e) {
+        if (e) e.preventDefault();
+        if (!privacyModal) return;
+        privacyModal.classList.add('hidden');
+        privacyModal.classList.remove('flex');
+      }
+
+      if (btnOpenPrivacy) btnOpenPrivacy.addEventListener('click', openPrivacyModal);
+      if (btnClosePrivacy) btnClosePrivacy.addEventListener('click', closePrivacyModal);
+      if (btnOkPrivacy) btnOkPrivacy.addEventListener('click', closePrivacyModal);
+      if (privacyModal) {
+        privacyModal.addEventListener('click', (e) => {
+          if (e.target === privacyModal) closePrivacyModal(e);
+        });
+      }
 
       document.getElementById('btn-copy').addEventListener('click', (e) => {
         e.preventDefault();
