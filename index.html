@@ -49,9 +49,17 @@
       --tg-accent: #9c6b3d;
       --tg-accent-text: #ffffff;
       --tg-border: #e7e5e4;
+      --active-border: #9c6b3d;
+      --active-bg: rgba(181, 132, 79, 0.14);
+      --active-text: #7f5433;
+      --inactive-border: #e7e5e4;
+      --inactive-bg: transparent;
+      --seg-active-bg: #ffffff;
+      --seg-active-text: #1c1917;
     }
 
-    html.dark {
+    html.dark,
+    html[data-theme="dark"] {
       --tg-bg: #141312;
       --tg-secondary-bg: #1f1d1b;
       --tg-text: #f5f5f4;
@@ -59,24 +67,69 @@
       --tg-accent: #c59e6f;
       --tg-accent-text: #141312;
       --tg-border: #2e2a27;
+      --active-border: #c59e6f;
+      --active-bg: rgba(197, 158, 111, 0.16);
+      --active-text: #e8dac3;
+      --inactive-border: #2e2a27;
+      --inactive-bg: transparent;
+      --seg-active-bg: #36322e;
+      --seg-active-text: #f5f5f4;
     }
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: var(--tg-bg);
-      color: var(--tg-text);
+      background-color: var(--tg-bg) !important;
+      color: var(--tg-text) !important;
       -webkit-tap-highlight-color: transparent;
       overflow-x: hidden;
+      transition: background-color 0.2s ease, color 0.2s ease;
     }
 
     .card-surface {
-      background-color: var(--tg-secondary-bg);
-      border: 1px solid var(--tg-border);
+      background-color: var(--tg-secondary-bg) !important;
+      border: 1px solid var(--tg-border) !important;
     }
 
     .text-hint {
-      color: var(--tg-hint);
+      color: var(--tg-hint) !important;
     }
+
+    .text-wood-accent {
+      color: var(--active-text) !important;
+    }
+
+    /* Единый детерминированный стиль выбранного и невыбранного элемента */
+    .selectable-item {
+      border: 1.5px solid var(--inactive-border) !important;
+      background-color: var(--inactive-bg) !important;
+      color: var(--tg-text);
+      transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease, transform 0.12s ease;
+    }
+
+    .selectable-item.is-selected {
+      border: 2.5px solid var(--active-border) !important;
+      background-color: var(--active-bg) !important;
+      color: var(--active-text) !important;
+      font-weight: 600;
+    }
+
+    .seg-btn {
+      color: var(--tg-hint);
+      background-color: transparent;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .seg-btn.is-active {
+      background-color: var(--seg-active-bg) !important;
+      color: var(--seg-active-text) !important;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Иконки темы в зависимости от реального состояния dark */
+    .icon-moon-only { display: block; }
+    .icon-sun-only { display: none; }
+    html.dark .icon-moon-only { display: none; }
+    html.dark .icon-sun-only { display: block; }
 
     input[type="number"]::-webkit-inner-spin-button,
     input[type="number"]::-webkit-outer-spin-button {
@@ -85,6 +138,9 @@
     }
     input[type="number"] {
       -moz-appearance: textfield;
+      background-color: var(--tg-bg) !important;
+      color: var(--tg-text) !important;
+      border-color: var(--tg-border) !important;
     }
 
     svg rect, svg line, svg text, svg path, svg circle, svg g {
@@ -92,12 +148,12 @@
     }
   </style>
 </head>
-<body class="antialiased pb-28 selection:bg-wood-300 selection:text-stone-900">
+<body class="antialiased pb-28">
 
   <!-- Уведомление (Toast) -->
   <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 transition-all duration-300 transform -translate-y-2 max-w-[92vw]">
-    <div class="bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 text-xs font-medium px-4 py-2.5 rounded-full shadow-lg flex items-center gap-2">
-      <svg class="w-4 h-4 text-emerald-400 dark:text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div id="toast-box" class="bg-stone-900 text-white text-xs font-medium px-4 py-2.5 rounded-full shadow-lg flex items-center gap-2">
+      <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M5 13l4 4L19 7" />
       </svg>
       <span id="toast-message" class="truncate">Расчёт скопирован в буфер обмена</span>
@@ -111,7 +167,7 @@
     <header class="flex items-center justify-between">
       <div>
         <div class="flex items-center gap-2">
-          <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-wood-600/15 text-wood-700 dark:text-wood-300">
+          <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-wood-500/15 text-wood-accent">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm4 3v8h8V8H8z" />
             </svg>
@@ -123,10 +179,10 @@
 
       <!-- Кнопка переключения темы -->
       <button id="theme-toggle" type="button" aria-label="Переключить тему" class="p-2.5 rounded-xl card-surface text-hint hover:opacity-80 active:scale-95 transition">
-        <svg id="icon-sun" class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-4 h-4 icon-sun-only" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
         </svg>
-        <svg id="icon-moon" class="w-4 h-4 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-4 h-4 icon-moon-only" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
         </svg>
       </button>
@@ -140,22 +196,22 @@
       </div>
 
       <div class="grid grid-cols-3 gap-2.5" id="wood-selector">
-        <button type="button" data-wood="beech" class="wood-card active relative flex flex-col items-start p-3 rounded-xl border-2 border-wood-600 bg-wood-500/10 text-left transition active:scale-[0.98]">
-          <span class="w-4 h-4 rounded-full mb-2 shadow-inner border border-black/10" style="background: linear-gradient(135deg, #ecc9a8 0%, #d4a379 100%);"></span>
+        <button type="button" data-wood="beech" class="wood-card selectable-item is-selected relative flex flex-col items-start p-3 rounded-xl text-left active:scale-[0.98]">
+          <span class="w-4 h-4 rounded-full mb-2 shadow-inner border border-black/15" style="background: linear-gradient(135deg, #ecc9a8 0%, #d4a379 100%);"></span>
           <span class="text-sm font-bold leading-tight">Бук</span>
-          <span class="text-xs font-semibold text-wood-700 dark:text-wood-300 mt-1">1 100 ₽</span>
+          <span class="wood-price text-xs font-semibold text-wood-accent mt-1">1 100 ₽</span>
         </button>
 
-        <button type="button" data-wood="ash" class="wood-card relative flex flex-col items-start p-3 rounded-xl border border-stone-200 dark:border-stone-700 hover:border-wood-400 text-left transition active:scale-[0.98]">
-          <span class="w-4 h-4 rounded-full mb-2 shadow-inner border border-black/10" style="background: linear-gradient(135deg, #dfc194 0%, #b58d58 100%);"></span>
+        <button type="button" data-wood="ash" class="wood-card selectable-item relative flex flex-col items-start p-3 rounded-xl text-left active:scale-[0.98]">
+          <span class="w-4 h-4 rounded-full mb-2 shadow-inner border border-black/15" style="background: linear-gradient(135deg, #dfc194 0%, #b58d58 100%);"></span>
           <span class="text-sm font-bold leading-tight">Ясень</span>
-          <span class="text-xs font-semibold text-hint mt-1">1 400 ₽</span>
+          <span class="wood-price text-xs font-semibold text-hint mt-1">1 400 ₽</span>
         </button>
 
-        <button type="button" data-wood="oak" class="wood-card relative flex flex-col items-start p-3 rounded-xl border border-stone-200 dark:border-stone-700 hover:border-wood-400 text-left transition active:scale-[0.98]">
-          <span class="w-4 h-4 rounded-full mb-2 shadow-inner border border-black/10" style="background: linear-gradient(135deg, #b88c58 0%, #7c562c 100%);"></span>
+        <button type="button" data-wood="oak" class="wood-card selectable-item relative flex flex-col items-start p-3 rounded-xl text-left active:scale-[0.98]">
+          <span class="w-4 h-4 rounded-full mb-2 shadow-inner border border-black/15" style="background: linear-gradient(135deg, #b88c58 0%, #7c562c 100%);"></span>
           <span class="text-sm font-bold leading-tight">Дуб</span>
-          <span class="text-xs font-semibold text-hint mt-1">1 500 ₽</span>
+          <span class="wood-price text-xs font-semibold text-hint mt-1">1 500 ₽</span>
         </button>
       </div>
     </section>
@@ -164,7 +220,7 @@
     <section class="card-surface rounded-2xl p-4 shadow-sm space-y-3">
       <div class="flex items-center justify-between">
         <h2 class="text-sm font-semibold">2. Размер основы для картины</h2>
-        <span class="text-[11px] font-medium px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800 text-hint">в сантиметрах</span>
+        <span class="text-[11px] font-medium px-2 py-0.5 rounded-md bg-stone-500/10 text-hint">в сантиметрах</span>
       </div>
 
       <div class="grid grid-cols-2 gap-3">
@@ -172,7 +228,7 @@
           <label for="art-width" class="block text-xs text-hint mb-1">Ширина основы, см</label>
           <div class="relative">
             <input id="art-width" type="number" inputmode="decimal" min="5" max="400" step="0.5" value="50"
-              class="w-full rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50/70 dark:bg-stone-900/60 px-3.5 py-2.5 text-base font-semibold focus:outline-none focus:ring-2 focus:ring-wood-500 transition" />
+              class="w-full rounded-xl border px-3.5 py-2.5 text-base font-semibold focus:outline-none focus:ring-2 focus:ring-wood-500 transition" />
             <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-hint pointer-events-none">см</span>
           </div>
         </div>
@@ -180,7 +236,7 @@
           <label for="art-height" class="block text-xs text-hint mb-1">Высота основы, см</label>
           <div class="relative">
             <input id="art-height" type="number" inputmode="decimal" min="5" max="400" step="0.5" value="70"
-              class="w-full rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50/70 dark:bg-stone-900/60 px-3.5 py-2.5 text-base font-semibold focus:outline-none focus:ring-2 focus:ring-wood-500 transition" />
+              class="w-full rounded-xl border px-3.5 py-2.5 text-base font-semibold focus:outline-none focus:ring-2 focus:ring-wood-500 transition" />
             <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-hint pointer-events-none">см</span>
           </div>
         </div>
@@ -188,11 +244,11 @@
 
       <!-- Быстрые популярные форматы -->
       <div class="flex flex-wrap gap-1.5 pt-0.5">
-        <button type="button" data-size="30x40" class="preset-size text-xs px-2.5 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 hover:border-wood-500 transition">30×40</button>
-        <button type="button" data-size="40x50" class="preset-size text-xs px-2.5 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 hover:border-wood-500 transition">40×50</button>
-        <button type="button" data-size="50x70" class="preset-size text-xs px-2.5 py-1.5 rounded-lg border-2 border-wood-600 bg-wood-500/10 font-medium text-wood-700 dark:text-wood-300 transition">50×70</button>
-        <button type="button" data-size="60x80" class="preset-size text-xs px-2.5 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 hover:border-wood-500 transition">60×80</button>
-        <button type="button" data-size="80x100" class="preset-size text-xs px-2.5 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 hover:border-wood-500 transition">80×100</button>
+        <button type="button" data-size="30x40" class="preset-size selectable-item text-xs px-2.5 py-1.5 rounded-lg">30×40</button>
+        <button type="button" data-size="40x50" class="preset-size selectable-item text-xs px-2.5 py-1.5 rounded-lg">40×50</button>
+        <button type="button" data-size="50x70" class="preset-size selectable-item is-selected text-xs px-2.5 py-1.5 rounded-lg">50×70</button>
+        <button type="button" data-size="60x80" class="preset-size selectable-item text-xs px-2.5 py-1.5 rounded-lg">60×80</button>
+        <button type="button" data-size="80x100" class="preset-size selectable-item text-xs px-2.5 py-1.5 rounded-lg">80×100</button>
       </div>
     </section>
 
@@ -204,14 +260,14 @@
       <div>
         <div class="flex items-center justify-between mb-1.5">
           <label for="profile-thickness" class="text-xs text-hint">Толщина стенки профиля (лицевая грань)</label>
-          <span class="text-xs font-semibold text-wood-700 dark:text-wood-300" id="profile-label">15 мм</span>
+          <span class="text-xs font-semibold text-wood-accent" id="profile-label">15 мм</span>
         </div>
         <div class="grid grid-cols-4 gap-2">
-          <button type="button" data-profile="10" class="preset-profile py-2 rounded-xl border border-stone-200 dark:border-stone-700 text-xs font-semibold transition">10 мм</button>
-          <button type="button" data-profile="15" class="preset-profile py-2 rounded-xl border-2 border-wood-600 bg-wood-500/10 text-wood-700 dark:text-wood-300 text-xs font-semibold transition">15 мм</button>
-          <button type="button" data-profile="20" class="preset-profile py-2 rounded-xl border border-stone-200 dark:border-stone-700 text-xs font-semibold transition">20 мм</button>
+          <button type="button" data-profile="10" class="preset-profile selectable-item py-2 rounded-xl text-xs font-semibold">10 мм</button>
+          <button type="button" data-profile="15" class="preset-profile selectable-item is-selected py-2 rounded-xl text-xs font-semibold">15 мм</button>
+          <button type="button" data-profile="20" class="preset-profile selectable-item py-2 rounded-xl text-xs font-semibold">20 мм</button>
           <input id="profile-thickness" type="number" inputmode="numeric" min="8" max="40" value="15" aria-label="Своя толщина стенки профиля в мм"
-            class="w-full rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50/70 dark:bg-stone-900/60 px-2 py-1.5 text-center text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-wood-500" />
+            class="w-full rounded-xl border px-2 py-1.5 text-center text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-wood-500" />
         </div>
       </div>
 
@@ -219,18 +275,18 @@
       <div>
         <div class="flex items-center justify-between mb-1.5">
           <label for="gap-size" class="text-xs text-hint">Зазор между рамой и основой (от 3 мм)</label>
-          <span class="text-xs font-semibold text-wood-700 dark:text-wood-300" id="gap-label">10 мм</span>
+          <span class="text-xs font-semibold text-wood-accent" id="gap-label">10 мм</span>
         </div>
         <div class="grid grid-cols-4 gap-2">
-          <button type="button" data-gap="3" class="preset-gap py-2 rounded-xl border border-stone-200 dark:border-stone-700 text-xs font-semibold transition">3 мм</button>
-          <button type="button" data-gap="5" class="preset-gap py-2 rounded-xl border border-stone-200 dark:border-stone-700 text-xs font-semibold transition">5 мм</button>
-          <button type="button" data-gap="10" class="preset-gap py-2 rounded-xl border-2 border-wood-600 bg-wood-500/10 text-wood-700 dark:text-wood-300 text-xs font-semibold transition">10 мм</button>
+          <button type="button" data-gap="3" class="preset-gap selectable-item py-2 rounded-xl text-xs font-semibold">3 мм</button>
+          <button type="button" data-gap="5" class="preset-gap selectable-item py-2 rounded-xl text-xs font-semibold">5 мм</button>
+          <button type="button" data-gap="10" class="preset-gap selectable-item is-selected py-2 rounded-xl text-xs font-semibold">10 мм</button>
           <input id="gap-size" type="number" inputmode="numeric" min="3" max="30" value="10" aria-label="Свой зазор в мм"
-            class="w-full rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50/70 dark:bg-stone-900/60 px-2 py-1.5 text-center text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-wood-500" />
+            class="w-full rounded-xl border px-2 py-1.5 text-center text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-wood-500" />
         </div>
 
         <!-- Пояснение про минимальный зазор 3 мм -->
-        <p class="mt-2 text-[11px] leading-snug text-hint bg-stone-100/80 dark:bg-stone-800/60 rounded-xl px-3 py-2">
+        <p class="mt-2 text-[11px] leading-snug text-hint bg-stone-500/10 rounded-xl px-3 py-2">
           Минимальный зазор — <strong>3 мм</strong> на сторону. Он необходим для компенсации температурного расширения/сужения натурального дерева и погрешности замеров, чтобы основа гарантированно вошла в раму.
         </p>
       </div>
@@ -244,18 +300,18 @@
       <div>
         <div class="flex items-center justify-between mb-1.5">
           <label for="canvas-thickness" class="text-xs text-hint">Толщина основы (подрамник / борд на подрамнике)</label>
-          <span class="text-xs font-semibold text-wood-700 dark:text-wood-300 shrink-0 ml-2" id="canvas-thick-label">20 мм</span>
+          <span class="text-xs font-semibold text-wood-accent shrink-0 ml-2" id="canvas-thick-label">20 мм</span>
         </div>
         <div class="grid grid-cols-4 gap-2">
-          <button type="button" data-canvas="15" class="preset-canvas py-2 px-1 rounded-xl border border-stone-200 dark:border-stone-700 text-[11px] font-semibold leading-tight transition">Тонкий<br><span class="text-hint font-normal">15 мм</span></button>
-          <button type="button" data-canvas="20" class="preset-canvas py-2 px-1 rounded-xl border-2 border-wood-600 bg-wood-500/10 text-wood-700 dark:text-wood-300 text-[11px] font-semibold leading-tight transition">Стандарт<br><span class="opacity-80 font-normal">20 мм</span></button>
-          <button type="button" data-canvas="35" class="preset-canvas py-2 px-1 rounded-xl border border-stone-200 dark:border-stone-700 text-[11px] font-semibold leading-tight transition">Глубокий<br><span class="text-hint font-normal">35 мм</span></button>
+          <button type="button" data-canvas="15" class="preset-canvas selectable-item py-2 px-1 rounded-xl text-[11px] font-semibold leading-tight">Тонкий<br><span class="text-hint font-normal">15 мм</span></button>
+          <button type="button" data-canvas="20" class="preset-canvas selectable-item is-selected py-2 px-1 rounded-xl text-[11px] font-semibold leading-tight">Стандарт<br><span class="opacity-80 font-normal">20 мм</span></button>
+          <button type="button" data-canvas="35" class="preset-canvas selectable-item py-2 px-1 rounded-xl text-[11px] font-semibold leading-tight">Глубокий<br><span class="text-hint font-normal">35 мм</span></button>
           <input id="canvas-thickness" type="number" inputmode="numeric" min="15" max="50" value="20" aria-label="Своя толщина основы в мм"
-            class="w-full rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50/70 dark:bg-stone-900/60 px-2 py-1.5 text-center text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-wood-500" />
+            class="w-full rounded-xl border px-2 py-1.5 text-center text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-wood-500" />
         </div>
 
         <!-- Информационное предупреждение про тонкие борды от 6 мм -->
-        <div class="mt-2 text-[11px] leading-snug text-hint bg-stone-100/80 dark:bg-stone-800/60 rounded-xl px-3 py-2">
+        <div class="mt-2 text-[11px] leading-snug text-hint bg-stone-500/10 rounded-xl px-3 py-2">
           Для тонких бордов (от 6 мм) саморезы не применяются — они пробьют основу насквозь. Такие заказы обсуждаются индивидуально (клей или дополнительный подрамник).
         </div>
       </div>
@@ -263,27 +319,27 @@
       <!-- Положение работы относительно края рамы -->
       <div>
         <span class="block text-xs text-hint mb-1.5">Положение работы относительно края рамы</span>
-        <div class="grid grid-cols-2 gap-2 p-1 rounded-xl bg-stone-100 dark:bg-stone-800/80">
-          <button type="button" id="fit-flush" class="py-2 px-3 rounded-lg text-xs font-semibold bg-white dark:bg-stone-700 shadow-sm transition">
+        <div class="grid grid-cols-2 gap-2 p-1 rounded-xl bg-stone-500/10">
+          <button type="button" id="fit-flush" class="seg-btn is-active py-2 px-3 rounded-lg text-xs font-semibold">
             Вровень с краем
           </button>
-          <button type="button" id="fit-recessed" class="py-2 px-3 rounded-lg text-xs font-semibold text-hint hover:text-stone-900 dark:hover:text-white transition">
+          <button type="button" id="fit-recessed" class="seg-btn py-2 px-3 rounded-lg text-xs font-semibold">
             Утопить внутрь
           </button>
         </div>
 
         <!-- Глубина утопления -->
-        <div id="recess-controls" class="hidden mt-3 pt-3 border-t border-stone-200/70 dark:border-stone-700/70">
+        <div id="recess-controls" class="hidden mt-3 pt-3 border-t border-stone-500/15">
           <div class="flex items-center justify-between mb-1.5">
             <label for="recess-depth" class="text-xs text-hint">На сколько утопить основу внутрь (для объёма)</label>
-            <span class="text-xs font-semibold text-wood-700 dark:text-wood-300" id="recess-label">5 мм</span>
+            <span class="text-xs font-semibold text-wood-accent" id="recess-label">5 мм</span>
           </div>
           <div class="grid grid-cols-4 gap-2">
-            <button type="button" data-recess="5" class="preset-recess py-2 rounded-xl border-2 border-wood-600 bg-wood-500/10 text-wood-700 dark:text-wood-300 text-xs font-semibold transition">5 мм</button>
-            <button type="button" data-recess="10" class="preset-recess py-2 rounded-xl border border-stone-200 dark:border-stone-700 text-xs font-semibold transition">10 мм</button>
-            <button type="button" data-recess="15" class="preset-recess py-2 rounded-xl border border-stone-200 dark:border-stone-700 text-xs font-semibold transition">15 мм</button>
+            <button type="button" data-recess="5" class="preset-recess selectable-item is-selected py-2 rounded-xl text-xs font-semibold">5 мм</button>
+            <button type="button" data-recess="10" class="preset-recess selectable-item py-2 rounded-xl text-xs font-semibold">10 мм</button>
+            <button type="button" data-recess="15" class="preset-recess selectable-item py-2 rounded-xl text-xs font-semibold">15 мм</button>
             <input id="recess-depth" type="number" inputmode="numeric" min="1" max="30" value="5" aria-label="Своя глубина утопления в мм"
-              class="w-full rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50/70 dark:bg-stone-900/60 px-2 py-1.5 text-center text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-wood-500" />
+              class="w-full rounded-xl border px-2 py-1.5 text-center text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-wood-500" />
           </div>
         </div>
       </div>
@@ -293,14 +349,14 @@
     <section class="card-surface rounded-2xl p-4 shadow-sm space-y-3">
       <div class="flex items-center justify-between">
         <h2 class="text-sm font-semibold">5. Фрезерованные скрытые крепления</h2>
-        <span id="hangers-price-badge" class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800 text-hint">0 ₽</span>
+        <span id="hangers-price-badge" class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-stone-500/10 text-hint">0 ₽</span>
       </div>
 
-      <div class="grid grid-cols-2 gap-2 p-1 rounded-xl bg-stone-100 dark:bg-stone-800/80">
-        <button type="button" id="hangers-no" class="py-2 px-2.5 rounded-lg text-xs font-semibold bg-white dark:bg-stone-700 shadow-sm transition">
+      <div class="grid grid-cols-2 gap-2 p-1 rounded-xl bg-stone-500/10">
+        <button type="button" id="hangers-no" class="seg-btn is-active py-2 px-2.5 rounded-lg text-xs font-semibold">
           Без креплений
         </button>
-        <button type="button" id="hangers-yes" class="py-2 px-2.5 rounded-lg text-xs font-semibold text-hint hover:text-stone-900 dark:hover:text-white transition">
+        <button type="button" id="hangers-yes" class="seg-btn py-2 px-2.5 rounded-lg text-xs font-semibold">
           Установить (+150 ₽)
         </button>
       </div>
@@ -310,13 +366,13 @@
         <div>
           <span class="block text-xs text-hint mb-1.5">Ориентация картины при развеске</span>
           <div class="grid grid-cols-2 gap-2">
-            <button type="button" id="orient-vertical" class="py-2 px-3 rounded-xl border-2 border-wood-600 bg-wood-500/10 text-wood-700 dark:text-wood-300 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+            <button type="button" id="orient-vertical" class="selectable-item is-selected py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5">
               <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <rect x="6" y="3" width="12" height="18" rx="1.5" stroke-width="2" />
               </svg>
               <span>Вертикально</span>
             </button>
-            <button type="button" id="orient-horizontal" class="py-2 px-3 rounded-xl border border-stone-200 dark:border-stone-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+            <button type="button" id="orient-horizontal" class="selectable-item py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5">
               <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <rect x="3" y="6" width="18" height="12" rx="1.5" stroke-width="2" />
               </svg>
@@ -326,23 +382,18 @@
         </div>
 
         <!-- Интерактивная SVG-схема тыльной стороны рамы с креплениями -->
-        <div class="w-full rounded-xl bg-stone-50 dark:bg-stone-900/70 border border-stone-200/70 dark:border-stone-800 p-3 flex flex-col items-center">
+        <div class="w-full rounded-xl bg-stone-500/5 border border-stone-500/15 p-3 flex flex-col items-center">
           <div class="w-full flex items-center justify-between text-[11px] text-hint mb-1">
             <span>Вид с тыльной стороны рамы</span>
-            <span id="hangers-orient-caption" class="font-semibold text-wood-700 dark:text-wood-300">Вертикально (портрет)</span>
+            <span id="hangers-orient-caption" class="font-semibold text-wood-accent">Вертикально (портрет)</span>
           </div>
 
           <svg id="hangers-svg" viewBox="0 0 300 175" class="w-full max-w-[300px] h-auto overflow-visible">
-            <!-- Группа рамы (меняет пропорции под вертикаль/горизонталь) -->
             <g id="hanger-frame-group">
-              <!-- Внешний контур деревянной рамы -->
               <rect id="hanger-outer-rect" x="95" y="10" width="110" height="145" rx="3" fill="#d4a379" stroke="#7f5433" stroke-width="1.5" />
-              <!-- Внутренняя четверть / задняя стенка 8 мм -->
               <rect id="hanger-rebate-rect" x="107" y="22" width="86" height="121" rx="1" fill="#b5844f" stroke="#7f5433" stroke-width="1" />
-              <!-- Внутренний проём -->
               <rect id="hanger-inner-rect" x="115" y="30" width="70" height="105" rx="1" fill="#f5f5f4" stroke="#7f5433" stroke-width="1" />
 
-              <!-- Левое фрезерованное крепление (металлическая планка с замочной скважиной) -->
               <g id="hanger-slot-left" transform="translate(101, 44)">
                 <rect x="-3.5" y="-12" width="7" height="24" rx="3.5" fill="#3f3f46" stroke="#18181b" stroke-width="0.8" />
                 <circle cx="0" cy="-7" r="1.2" fill="#d4d4d8" />
@@ -351,7 +402,6 @@
                 <circle cx="0" cy="8" r="1.2" fill="#d4d4d8" />
               </g>
 
-              <!-- Правое фрезерованное крепление -->
               <g id="hanger-slot-right" transform="translate(199, 44)">
                 <rect x="-3.5" y="-12" width="7" height="24" rx="3.5" fill="#3f3f46" stroke="#18181b" stroke-width="0.8" />
                 <circle cx="0" cy="-7" r="1.2" fill="#d4d4d8" />
@@ -360,11 +410,9 @@
                 <circle cx="0" cy="8" r="1.2" fill="#d4d4d8" />
               </g>
 
-              <!-- Пунктирная линия уровня между двумя точками подвеса -->
               <line id="hanger-level-line" x1="82" y1="47.5" x2="218" y2="47.5" stroke="#0284c7" stroke-width="1" stroke-dasharray="3 2" />
             </g>
 
-            <!-- Подпись снизу -->
             <text x="150" y="169" text-anchor="middle" font-size="9.5" font-weight="600" fill="#78716c">
               Скрытый фрезерованный паз × 2 шт. (навешивается по уровню)
             </text>
@@ -377,62 +425,49 @@
     <section class="card-surface rounded-2xl p-4 shadow-sm space-y-3">
       <div class="flex items-center justify-between gap-2">
         <h2 class="text-sm font-semibold">Схема посадки в профиль (разрез)</h2>
-        <span id="badge-profile-depth" class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 shrink-0">
+        <span id="badge-profile-depth" class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 shrink-0">
           Высота борта: 40 мм (стандарт)
         </span>
       </div>
 
-      <!-- Интерактивный SVG-чертёж -->
-      <div class="w-full rounded-xl bg-stone-50 dark:bg-stone-900/70 border border-stone-200/70 dark:border-stone-800 p-3 flex flex-col items-center">
+      <div class="w-full rounded-xl bg-stone-500/5 border border-stone-500/15 p-3 flex flex-col items-center">
         <svg id="cross-section-svg" viewBox="0 0 320 158" class="w-full max-w-[320px] h-auto overflow-visible">
-          <!-- Линия лицевой плоскости рамы -->
           <line id="svg-face-line" x1="30" y1="24" x2="290" y2="24" stroke="#a8a29e" stroke-width="1" stroke-dasharray="4 3" />
           <text x="290" y="19" text-anchor="end" font-size="9" fill="#78716c">Лицевая плоскость рамы</text>
 
-          <!-- Линия тыльной плоскости рамы (задний край борта) -->
           <line id="svg-rear-edge-line" x1="42" y1="120" x2="270" y2="120" stroke="#a8a29e" stroke-width="1" stroke-dasharray="3 3" />
 
-          <!-- Вертикальная стенка профиля рамы (на всю высоту борта от 24 до 120) -->
           <rect id="svg-wall" x="52" y="24" width="24" height="96" rx="2" fill="#c59e6f" stroke="#7f5433" stroke-width="1.2" />
 
-          <!-- Основа для картины (подрамник / борд) -->
           <rect id="svg-canvas" x="92" y="24" width="148" height="48" rx="2" fill="#e7e5e4" stroke="#57534e" stroke-width="1.2" />
           <text id="svg-canvas-label" x="166" y="51" text-anchor="middle" font-size="11" font-weight="600" fill="#292524">Основа 20 мм</text>
 
-          <!-- Линия примыкания / фиксации основы к задней стенке -->
           <line id="svg-contact-line" x1="76" y1="73" x2="240" y2="73" stroke="#1c1917" stroke-width="2" />
 
-          <!-- Задняя стенка 8 мм (перемещается строго вместе с основой!) -->
           <rect id="svg-back" x="76" y="74" width="164" height="19" rx="2" fill="#b5844f" stroke="#7f5433" stroke-width="1.2" />
           <text id="svg-back-label" x="158" y="86.5" text-anchor="middle" font-size="9" font-weight="600" fill="#ffffff">Задняя стенка 8 мм</text>
 
-          <!-- Подпись свободного пространства сзади (когда есть запас до тыльного края рамы) -->
           <text id="svg-rear-space-label" x="158" y="110" text-anchor="middle" font-size="8.5" fill="#78716c" opacity="1">
             Свободное пространство сзади
           </text>
 
-          <!-- Размерная линия: Утопление (если > 0) -->
           <g id="svg-recess-group" opacity="0">
             <line id="svg-recess-line" x1="112" y1="24" x2="112" y2="36" stroke="#dc2626" stroke-width="1.5" />
             <text id="svg-recess-text" x="118" y="33" font-size="9.5" font-weight="700" fill="#dc2626">Утопление 5 мм</text>
           </g>
 
-          <!-- Размерная линия: Зазор -->
           <line id="svg-gap-line" x1="76" y1="42" x2="92" y2="42" stroke="#0284c7" stroke-width="1.5" />
           <text id="svg-gap-text" x="84" y="36" text-anchor="middle" font-size="9" font-weight="700" fill="#0284c7">10 мм</text>
 
-          <!-- Подпись толщины стенки -->
           <text id="svg-wall-text" x="64" y="135" text-anchor="middle" font-size="9.5" font-weight="600" fill="#78716c">Стенка 15 мм</text>
 
-          <!-- Размерная линия: Общая высота борта рамы (справа) -->
           <line x1="262" y1="24" x2="262" y2="120" stroke="#78716c" stroke-width="1.2" />
           <line x1="257" y1="24" x2="267" y2="24" stroke="#78716c" stroke-width="1.2" />
           <line x1="257" y1="120" x2="267" y2="120" stroke="#78716c" stroke-width="1.2" />
           <text id="svg-total-depth-text" x="272" y="75" font-size="10" font-weight="700" fill="#78716c">40 мм</text>
         </svg>
 
-        <!-- Сводка по внешним габаритам -->
-        <div class="w-full grid grid-cols-2 gap-2 pt-2.5 mt-1 border-t border-stone-200/70 dark:border-stone-800 text-xs">
+        <div class="w-full grid grid-cols-2 gap-2 pt-2.5 mt-1 border-t border-stone-500/15 text-xs">
           <div class="flex flex-col">
             <span class="text-hint text-[11px]">Внешний габарит рамы:</span>
             <span id="outer-dimensions" class="font-bold text-sm">55.0 × 75.0 см</span>
@@ -446,15 +481,14 @@
     </section>
 
     <!-- 7. Итоговый расчёт -->
-    <section id="result-card" class="card-surface rounded-2xl p-4 shadow-md border-wood-500/40 space-y-3">
-      <!-- Блок нормального расчёта (глубина <= 55 мм) -->
+    <section id="result-card" class="card-surface rounded-2xl p-4 shadow-md space-y-3">
       <div id="price-valid-block">
         <div class="flex items-baseline justify-between gap-2">
           <div>
             <span class="text-xs text-hint block">Итоговая стоимость</span>
             <div class="flex flex-wrap items-baseline gap-2 mt-0.5">
-              <span id="total-price" class="text-3xl font-extrabold tracking-tight text-wood-700 dark:text-wood-300">2 860 ₽</span>
-              <span id="surcharge-badge" class="hidden text-[11px] font-semibold px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300">
+              <span id="total-price" class="text-3xl font-extrabold tracking-tight text-wood-accent">2 860 ₽</span>
+              <span id="surcharge-badge" class="hidden text-[11px] font-semibold px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-600">
                 +10% за глубину
               </span>
             </div>
@@ -462,27 +496,25 @@
           <div class="text-right text-xs text-hint shrink-0">
             <div id="wood-rate-summary">Бук · 1 100 ₽/м.п.</div>
             <div id="depth-summary" class="mt-0.5">Профиль 40 мм</div>
-            <div id="hangers-summary" class="mt-0.5 hidden text-wood-700 dark:text-wood-300 font-medium">+ крепления 150 ₽</div>
+            <div id="hangers-summary" class="mt-0.5 hidden text-wood-accent font-medium">+ крепления 150 ₽</div>
           </div>
         </div>
       </div>
 
-      <!-- Блок предупреждения при глубине > 55 мм -->
       <div id="price-custom-block" class="hidden rounded-xl bg-amber-500/10 border border-amber-500/30 p-3.5 space-y-1.5">
-        <div class="flex items-center gap-2 text-amber-800 dark:text-amber-300 font-bold text-sm">
+        <div class="flex items-center gap-2 text-amber-600 font-bold text-sm">
           <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
           <span>Индивидуальный расчёт (глубина <span id="custom-depth-val">58</span> мм)</span>
         </div>
-        <p class="text-xs leading-relaxed text-stone-700 dark:text-stone-300">
+        <p class="text-xs leading-relaxed text-hint">
           Требуемая глубина профиля превышает максимальный вылет пильного диска (55 мм). Такие заказы обсуждаются индивидуально с мастером — отправьте параметры для уточнения возможности и стоимости.
         </p>
       </div>
 
-      <!-- Обязательная технологическая памятка -->
-      <div class="flex items-start gap-2 pt-2 border-t border-stone-200/70 dark:border-stone-800 text-[11px] text-hint leading-snug">
-        <svg class="w-4 h-4 text-wood-600 dark:text-wood-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="flex items-start gap-2 pt-2 border-t border-stone-500/15 text-[11px] text-hint leading-snug">
+        <svg class="w-4 h-4 text-wood-accent shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         <span>Рама поставляется без покраски (шлифованный массив, готовый под любое покрытие).</span>
@@ -492,9 +524,9 @@
   </main>
 
   <!-- Нижняя фиксированная панель действий -->
-  <footer class="fixed bottom-0 inset-x-0 z-40 border-t border-stone-200/80 dark:border-stone-800/90 backdrop-blur-md bg-white/90 dark:bg-stone-950/90 px-4 py-3">
+  <footer id="bottom-bar" class="fixed bottom-0 inset-x-0 z-40 border-t border-stone-500/20 backdrop-blur-md px-4 py-3" style="background-color: var(--tg-secondary-bg);">
     <div class="max-w-lg mx-auto flex items-center gap-2.5">
-      <button id="btn-copy" type="button" class="flex-1 py-3 px-3.5 rounded-xl border border-stone-300 dark:border-stone-700 font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 hover:bg-stone-100 dark:hover:bg-stone-800 active:scale-[0.98] transition">
+      <button id="btn-copy" type="button" class="flex-1 py-3 px-3.5 rounded-xl border border-stone-500/30 font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 hover:opacity-85 active:scale-[0.98] transition">
         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
         </svg>
@@ -511,11 +543,6 @@
   </footer>
 
   <script>
-    /**
-     * ============================================================================
-     * НАСТРОЙКИ МАСТЕРСКОЙ (Отредактируйте username под свой аккаунт в Telegram)
-     * ============================================================================
-     */
     const MASTER_USERNAME = 'rulerdis';
     const LOG_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbx78C7I30dxkenHXsma5CxNdCjsa3d4TnhAnbb40WHb8j1PkBeR6bkH1sNvrDajKj8I/exec';
 
@@ -525,16 +552,15 @@
         ash:   { name: 'Ясень', price: 1400, color: '#c8a26e', rebateColor: '#a8824e', stroke: '#7a592e' },
         oak:   { name: 'Дуб', price: 1500, color: '#9c6b3d', rebateColor: '#7f5433', stroke: '#5c3c1e' }
       },
-      BACK_PANEL_MM: 8,        // Толщина задней стенки
-      TOLERANCE_MM: 1,         // Технологический запас
-      STANDARD_DEPTH_MM: 40,   // Стандартная высота борта по прайсу
-      MAX_STANDARD_SAW_MM: 55, // Максимальный вылет пильного диска
-      MIN_GAP_MM: 3,           // Минимальный зазор на сторону
-      MIN_BASE_THICK_MM: 15,   // Минимальная толщина основы
-      HANGERS_PRICE: 150       // Стоимость фрезерованных креплений (с двух сторон)
+      BACK_PANEL_MM: 8,
+      TOLERANCE_MM: 1,
+      STANDARD_DEPTH_MM: 40,
+      MAX_STANDARD_SAW_MM: 55,
+      MIN_GAP_MM: 3,
+      MIN_BASE_THICK_MM: 15,
+      HANGERS_PRICE: 150
     };
 
-    // Состояние калькулятора
     const state = {
       artWidthCm: 50,
       artHeightCm: 70,
@@ -545,78 +571,114 @@
       isRecessed: false,
       recessDepthMm: 5,
       hasHangers: false,
-      orientation: 'vertical', // 'vertical' | 'horizontal'
+      orientation: 'vertical',
       manualTheme: null // null | 'dark' | 'light'
     };
 
     const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 
+    /**
+     * Надёжная отправка статистики (сохраняем и в localStorage на случай офлайна/блокировок)
+     */
+    function saveLocalStat(eventName, orderText, meta) {
+      try {
+        const key = 'canvas_calc_stats_log';
+        const prev = JSON.parse(localStorage.getItem(key) || '[]');
+        prev.unshift({
+          ts: new Date().toISOString(),
+          event: eventName,
+          meta: meta,
+          preview: (orderText || '').split('\n')[0]
+        });
+        localStorage.setItem(key, JSON.stringify(prev.slice(0, 50)));
+      } catch (_) {}
+    }
+
     function sendSilentLog(eventName, orderText, meta = '') {
-      if (!LOG_WEBHOOK_URL) return;
-
-      const platform =
-        (tg && tg.platform) ||
-        navigator.platform ||
-        'web';
-
+      const platform = (tg && tg.platform) || navigator.platform || 'web';
       const tgUser =
         tg && tg.initDataUnsafe && tg.initDataUnsafe.user
           ? `${tg.initDataUnsafe.user.username ? '@' + tg.initDataUnsafe.user.username + ' ' : ''}(id:${tg.initDataUnsafe.user.id})`
           : 'anon';
 
       const defaultMeta = `platform: ${platform} | user: ${tgUser}`;
+      const fullMeta = meta ? `${defaultMeta} | ${meta}` : defaultMeta;
+      saveLocalStat(eventName, orderText, fullMeta);
 
+      if (!LOG_WEBHOOK_URL) return;
+
+      const payloadObj = {
+        event: eventName,
+        text: orderText || '',
+        meta: fullMeta,
+        timestamp: new Date().toISOString()
+      };
+      const jsonStr = JSON.stringify(payloadObj);
+
+      // 1. Пробуем sendBeacon (работает надёжно при закрытии/переходе)
+      try {
+        if (navigator.sendBeacon) {
+          const blob = new Blob([jsonStr], { type: 'text/plain;charset=utf-8' });
+          const queued = navigator.sendBeacon(LOG_WEBHOOK_URL, blob);
+          if (queued) return;
+        }
+      } catch (_) {}
+
+      // 2. Fallback через fetch с keepalive
       try {
         fetch(LOG_WEBHOOK_URL, {
           method: 'POST',
           mode: 'no-cors',
-          headers: {
-            'Content-Type': 'text/plain;charset=utf-8'
-          },
-          body: JSON.stringify({
-            event: eventName,
-            text: orderText || '',
-            meta: meta ? `${defaultMeta} | ${meta}` : defaultMeta
-          })
+          keepalive: true,
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: jsonStr
         }).catch(() => {});
-      } catch (e) {
-        // Ошибки фонового логирования не должны мешать работе калькулятора
-      }
+      } catch (_) {}
     }
 
+    /**
+     * Применение темы (ручной переключатель имеет приоритет над Telegram и системой)
+     */
     function applyThemeState() {
       const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
       const tgDark = tg && tg.colorScheme === 'dark';
-      const isDark = state.manualTheme !== null
-        ? state.manualTheme === 'dark'
-        : Boolean(tgDark || (!tg && prefersDark));
 
-      document.documentElement.classList.toggle('dark', isDark);
+      let isDark;
+      if (state.manualTheme === 'dark') {
+        isDark = true;
+      } else if (state.manualTheme === 'light') {
+        isDark = false;
+      } else {
+        isDark = Boolean(tgDark || (!tg && prefersDark));
+      }
 
-      if (tg && tg.themeParams) {
-        if (!isDark && tg.themeParams.bg_color) {
-          document.documentElement.style.setProperty('--tg-bg', tg.themeParams.bg_color);
-        } else if (isDark) {
-          document.documentElement.style.setProperty('--tg-bg', '#141312');
-        } else {
-          document.documentElement.style.setProperty('--tg-bg', '#f6f5f2');
+      const root = document.documentElement;
+      root.classList.toggle('dark', isDark);
+      root.setAttribute('data-theme', isDark ? 'dark' : 'light');
+
+      // Если тема выбрана вручную — не даём tg.themeParams затереть её
+      if (state.manualTheme === null && tg && tg.themeParams) {
+        if (tg.themeParams.bg_color) {
+          root.style.setProperty('--tg-bg', tg.themeParams.bg_color);
         }
-
-        if (!isDark && tg.themeParams.secondary_bg_color) {
-          document.documentElement.style.setProperty('--tg-secondary-bg', tg.themeParams.secondary_bg_color);
-        } else if (isDark) {
-          document.documentElement.style.setProperty('--tg-secondary-bg', '#1f1d1b');
-        } else {
-          document.documentElement.style.setProperty('--tg-secondary-bg', '#ffffff');
+        if (tg.themeParams.secondary_bg_color) {
+          root.style.setProperty('--tg-secondary-bg', tg.themeParams.secondary_bg_color);
         }
+      } else {
+        root.style.removeProperty('--tg-bg');
+        root.style.removeProperty('--tg-secondary-bg');
+      }
+
+      if (tg && typeof tg.setBackgroundColor === 'function') {
+        try {
+          tg.setBackgroundColor(isDark ? '#141312' : '#f6f5f2');
+        } catch (_) {}
       }
     }
 
     function initTelegram() {
-      if (!tg) {
-        applyThemeState();
-        return;
-      }
+      applyThemeState();
+      if (!tg) return;
       try {
         tg.ready();
         tg.expand();
@@ -650,9 +712,6 @@
       }, 2800);
     }
 
-    /**
-     * Главная функция расчёта
-     */
     function calculateFrame() {
       const widthCm = Math.max(1, parseFloat(state.artWidthCm) || 0);
       const heightCm = Math.max(1, parseFloat(state.artHeightCm) || 0);
@@ -661,20 +720,16 @@
       const baseMm = Math.max(CONFIG.MIN_BASE_THICK_MM, parseFloat(state.baseThicknessMm) || CONFIG.MIN_BASE_THICK_MM);
       const recessMm = state.isRecessed ? Math.max(1, parseFloat(state.recessDepthMm) || 0) : 0;
 
-      // 1. Внешние габариты рамы (см)
       const gapCm = gapMm / 10;
       const wallCm = profileMm / 10;
       const extW = widthCm + 2 * (gapCm + wallCm);
       const extH = heightCm + 2 * (gapCm + wallCm);
 
-      // 2. Периметр в погонных метрах
       const perimeter = (2 * (extW + extH)) / 100;
 
-      // 3. Требуемая глубина и фактическая высота борта
       const reqDepth = baseMm + recessMm + CONFIG.BACK_PANEL_MM + CONFIG.TOLERANCE_MM;
       const boardHeight = Math.max(CONFIG.STANDARD_DEPTH_MM, Math.ceil(reqDepth));
 
-      // 4. Коэффициент за глубину
       let depthMultiplier = 1.0;
       let surchargePercent = 0;
       let isCustomOnly = false;
@@ -695,7 +750,6 @@
         isCustomOnly = true;
       }
 
-      // 5. Стоимость рамы (округление вверх до 10 ₽) + крепления (150 ₽)
       const woodInfo = CONFIG.WOOD_TYPES[state.wood];
       const rawFrameCost = perimeter * woodInfo.price * depthMultiplier;
       const frameCost = Math.ceil(rawFrameCost / 10) * 10;
@@ -723,9 +777,6 @@
       };
     }
 
-    /**
-     * Обновление SVG-чертежа посадки в профиль
-     */
     function updateCrossSectionSVG(calc) {
       const svgWall = document.getElementById('svg-wall');
       const svgBack = document.getElementById('svg-back');
@@ -830,9 +881,6 @@
       svgTotalDepthText.textContent = `${calc.boardHeight} мм`;
     }
 
-    /**
-     * Обновление визуализации расположения фрезерованных креплений
-     */
     function updateHangersSVG(woodInfo) {
       const outerRect = document.getElementById('hanger-outer-rect');
       const rebateRect = document.getElementById('hanger-rebate-rect');
@@ -897,9 +945,6 @@
       }
     }
 
-    /**
-     * Обновление интерфейса
-     */
     function render() {
       const calc = calculateFrame();
 
@@ -915,13 +960,13 @@
       const depthBadge = document.getElementById('badge-profile-depth');
       if (calc.isCustomOnly) {
         depthBadge.textContent = `Требуется глубина: ${calc.boardHeight} мм (> 55 мм)`;
-        depthBadge.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 shrink-0';
+        depthBadge.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-600 shrink-0';
       } else if (calc.surchargePercent > 0) {
         depthBadge.textContent = `Высота борта: ${calc.boardHeight} мм (+${calc.surchargePercent}%)`;
-        depthBadge.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 shrink-0';
+        depthBadge.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-600 shrink-0';
       } else {
         depthBadge.textContent = `Высота борта: 40 мм (стандарт)`;
-        depthBadge.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 shrink-0';
+        depthBadge.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 shrink-0';
       }
 
       const validBlock = document.getElementById('price-valid-block');
@@ -958,9 +1003,6 @@
       updateHangersSVG(calc.woodInfo);
     }
 
-    /**
-     * Формирование текста заявки
-     */
     function buildOrderText() {
       const calc = calculateFrame();
       const fmtDim = (val) => Number.isInteger(val) ? val : val.toFixed(1);
@@ -1022,43 +1064,28 @@
       document.body.removeChild(textarea);
     }
 
-    function setButtonActiveState(btn, isActive) {
-      if (!btn) return;
-      if (isActive) {
-        btn.classList.remove('border', 'border-stone-200', 'dark:border-stone-700');
-        btn.classList.add('border-2', 'border-wood-600', 'bg-wood-500/10', 'font-medium', 'text-wood-700', 'dark:text-wood-300');
-      } else {
-        btn.classList.remove('border-2', 'border-wood-600', 'bg-wood-500/10', 'font-medium', 'text-wood-700', 'dark:text-wood-300');
-        btn.classList.add('border', 'border-stone-200', 'dark:border-stone-700');
-      }
-    }
-
-    function highlightPresetButtons(selector, attrName, activeValue) {
+    /**
+     * Обновляет состояние группы кнопок (.selectable-item) через класс .is-selected
+     */
+    function syncSelectableGroup(selector, attrName, activeValue) {
       document.querySelectorAll(selector).forEach((btn) => {
-        const val = btn.getAttribute(attrName);
-        setButtonActiveState(btn, String(val) === String(activeValue));
+        const isSelected = String(btn.getAttribute(attrName)) === String(activeValue);
+        btn.classList.toggle('is-selected', isSelected);
       });
     }
 
+    /**
+     * Обновляет карточки породы дерева (включая цвет цены)
+     */
     function syncWoodCardsUI() {
       document.querySelectorAll('.wood-card').forEach((card) => {
         const isSelected = card.getAttribute('data-wood') === state.wood;
-        const priceSpan = card.querySelector('span:last-child');
+        card.classList.toggle('is-selected', isSelected);
         card.classList.toggle('active', isSelected);
-        if (isSelected) {
-          card.classList.remove('border', 'border-stone-200', 'dark:border-stone-700');
-          card.classList.add('border-2', 'border-wood-600', 'bg-wood-500/10');
-          if (priceSpan) {
-            priceSpan.classList.remove('text-hint');
-            priceSpan.classList.add('text-wood-700', 'dark:text-wood-300');
-          }
-        } else {
-          card.classList.remove('border-2', 'border-wood-600', 'bg-wood-500/10');
-          card.classList.add('border', 'border-stone-200', 'dark:border-stone-700');
-          if (priceSpan) {
-            priceSpan.classList.remove('text-wood-700', 'dark:text-wood-300');
-            priceSpan.classList.add('text-hint');
-          }
+        const priceEl = card.querySelector('.wood-price');
+        if (priceEl) {
+          priceEl.classList.toggle('text-wood-accent', isSelected);
+          priceEl.classList.toggle('text-hint', !isSelected);
         }
       });
     }
@@ -1074,19 +1101,18 @@
         });
       }
 
-      // Ширина и высота основы
       const widthInput = document.getElementById('art-width');
       const heightInput = document.getElementById('art-height');
 
       widthInput.addEventListener('input', (e) => {
         state.artWidthCm = e.target.value;
-        highlightPresetButtons('.preset-size', 'data-size', `${state.artWidthCm}x${state.artHeightCm}`);
+        syncSelectableGroup('.preset-size', 'data-size', `${state.artWidthCm}x${state.artHeightCm}`);
         render();
       });
 
       heightInput.addEventListener('input', (e) => {
         state.artHeightCm = e.target.value;
-        highlightPresetButtons('.preset-size', 'data-size', `${state.artWidthCm}x${state.artHeightCm}`);
+        syncSelectableGroup('.preset-size', 'data-size', `${state.artWidthCm}x${state.artHeightCm}`);
         render();
       });
 
@@ -1098,12 +1124,11 @@
           state.artHeightCm = Number(h);
           widthInput.value = w;
           heightInput.value = h;
-          highlightPresetButtons('.preset-size', 'data-size', `${w}x${h}`);
+          syncSelectableGroup('.preset-size', 'data-size', `${w}x${h}`);
           render();
         });
       });
 
-      // Порода дерева
       document.querySelectorAll('.wood-card').forEach((card) => {
         card.addEventListener('click', (e) => {
           e.preventDefault();
@@ -1113,7 +1138,6 @@
         });
       });
 
-      // Толщина стенки профиля (min 8, max 40)
       const profileInput = document.getElementById('profile-thickness');
       document.querySelectorAll('.preset-profile').forEach((btn) => {
         btn.addEventListener('click', (e) => {
@@ -1121,14 +1145,14 @@
           const val = Number(btn.getAttribute('data-profile'));
           state.profileThicknessMm = val;
           profileInput.value = val;
-          highlightPresetButtons('.preset-profile', 'data-profile', val);
+          syncSelectableGroup('.preset-profile', 'data-profile', val);
           render();
         });
       });
       profileInput.addEventListener('input', (e) => {
         const raw = parseFloat(e.target.value);
         state.profileThicknessMm = isNaN(raw) ? 8 : Math.min(40, Math.max(8, raw));
-        highlightPresetButtons('.preset-profile', 'data-profile', state.profileThicknessMm);
+        syncSelectableGroup('.preset-profile', 'data-profile', state.profileThicknessMm);
         render();
       });
       profileInput.addEventListener('blur', (e) => {
@@ -1136,11 +1160,10 @@
         const clamped = isNaN(raw) ? 15 : Math.min(40, Math.max(8, raw));
         state.profileThicknessMm = clamped;
         e.target.value = clamped;
-        highlightPresetButtons('.preset-profile', 'data-profile', clamped);
+        syncSelectableGroup('.preset-profile', 'data-profile', clamped);
         render();
       });
 
-      // Зазор (СТРОГИЙ МИНИМУМ 3 мм)
       const gapInput = document.getElementById('gap-size');
       document.querySelectorAll('.preset-gap').forEach((btn) => {
         btn.addEventListener('click', (e) => {
@@ -1148,7 +1171,7 @@
           const val = Math.max(CONFIG.MIN_GAP_MM, Number(btn.getAttribute('data-gap')));
           state.gapMm = val;
           gapInput.value = val;
-          highlightPresetButtons('.preset-gap', 'data-gap', val);
+          syncSelectableGroup('.preset-gap', 'data-gap', val);
           render();
         });
       });
@@ -1161,7 +1184,7 @@
         } else {
           state.gapMm = isNaN(raw) ? CONFIG.MIN_GAP_MM : Math.min(30, Math.max(CONFIG.MIN_GAP_MM, raw));
         }
-        highlightPresetButtons('.preset-gap', 'data-gap', state.gapMm);
+        syncSelectableGroup('.preset-gap', 'data-gap', state.gapMm);
         render();
       });
       gapInput.addEventListener('blur', (e) => {
@@ -1169,11 +1192,10 @@
         const clamped = isNaN(raw) ? CONFIG.MIN_GAP_MM : Math.min(30, Math.max(CONFIG.MIN_GAP_MM, raw));
         state.gapMm = clamped;
         e.target.value = clamped;
-        highlightPresetButtons('.preset-gap', 'data-gap', clamped);
+        syncSelectableGroup('.preset-gap', 'data-gap', clamped);
         render();
       });
 
-      // Толщина основы для картины (СТРОГИЙ МИНИМУМ 15 мм)
       const canvasInput = document.getElementById('canvas-thickness');
       document.querySelectorAll('.preset-canvas').forEach((btn) => {
         btn.addEventListener('click', (e) => {
@@ -1181,14 +1203,14 @@
           const val = Math.max(CONFIG.MIN_BASE_THICK_MM, Number(btn.getAttribute('data-canvas')));
           state.baseThicknessMm = val;
           canvasInput.value = val;
-          highlightPresetButtons('.preset-canvas', 'data-canvas', val);
+          syncSelectableGroup('.preset-canvas', 'data-canvas', val);
           render();
         });
       });
       canvasInput.addEventListener('input', (e) => {
         const raw = parseFloat(e.target.value);
         state.baseThicknessMm = isNaN(raw) ? CONFIG.MIN_BASE_THICK_MM : Math.min(50, Math.max(CONFIG.MIN_BASE_THICK_MM, raw));
-        highlightPresetButtons('.preset-canvas', 'data-canvas', state.baseThicknessMm);
+        syncSelectableGroup('.preset-canvas', 'data-canvas', state.baseThicknessMm);
         render();
       });
       canvasInput.addEventListener('blur', (e) => {
@@ -1199,11 +1221,10 @@
         const clamped = isNaN(raw) ? CONFIG.MIN_BASE_THICK_MM : Math.min(50, Math.max(CONFIG.MIN_BASE_THICK_MM, raw));
         state.baseThicknessMm = clamped;
         e.target.value = clamped;
-        highlightPresetButtons('.preset-canvas', 'data-canvas', clamped);
+        syncSelectableGroup('.preset-canvas', 'data-canvas', clamped);
         render();
       });
 
-      // Переключатель посадки (вровень / утопить)
       const btnFlush = document.getElementById('fit-flush');
       const btnRecessed = document.getElementById('fit-recessed');
       const recessControls = document.getElementById('recess-controls');
@@ -1211,10 +1232,8 @@
       btnFlush.addEventListener('click', (e) => {
         e.preventDefault();
         state.isRecessed = false;
-        btnFlush.classList.add('bg-white', 'dark:bg-stone-700', 'shadow-sm');
-        btnFlush.classList.remove('text-hint');
-        btnRecessed.classList.remove('bg-white', 'dark:bg-stone-700', 'shadow-sm');
-        btnRecessed.classList.add('text-hint');
+        btnFlush.classList.add('is-active');
+        btnRecessed.classList.remove('is-active');
         recessControls.classList.add('hidden');
         render();
       });
@@ -1222,15 +1241,12 @@
       btnRecessed.addEventListener('click', (e) => {
         e.preventDefault();
         state.isRecessed = true;
-        btnRecessed.classList.add('bg-white', 'dark:bg-stone-700', 'shadow-sm');
-        btnRecessed.classList.remove('text-hint');
-        btnFlush.classList.remove('bg-white', 'dark:bg-stone-700', 'shadow-sm');
-        btnFlush.classList.add('text-hint');
+        btnRecessed.classList.add('is-active');
+        btnFlush.classList.remove('is-active');
         recessControls.classList.remove('hidden');
         render();
       });
 
-      // Глубина утопления
       const recessInput = document.getElementById('recess-depth');
       document.querySelectorAll('.preset-recess').forEach((btn) => {
         btn.addEventListener('click', (e) => {
@@ -1238,18 +1254,17 @@
           const val = Number(btn.getAttribute('data-recess'));
           state.recessDepthMm = val;
           recessInput.value = val;
-          highlightPresetButtons('.preset-recess', 'data-recess', val);
+          syncSelectableGroup('.preset-recess', 'data-recess', val);
           render();
         });
       });
       recessInput.addEventListener('input', (e) => {
         const raw = parseFloat(e.target.value);
         state.recessDepthMm = isNaN(raw) ? 1 : Math.min(30, Math.max(1, raw));
-        highlightPresetButtons('.preset-recess', 'data-recess', state.recessDepthMm);
+        syncSelectableGroup('.preset-recess', 'data-recess', state.recessDepthMm);
         render();
       });
 
-      // Фрезерованные крепления (+150 ₽) и выбор ориентации
       const btnHangersNo = document.getElementById('hangers-no');
       const btnHangersYes = document.getElementById('hangers-yes');
       const hangersDetails = document.getElementById('hangers-details');
@@ -1258,26 +1273,22 @@
       btnHangersNo.addEventListener('click', (e) => {
         e.preventDefault();
         state.hasHangers = false;
-        btnHangersNo.classList.add('bg-white', 'dark:bg-stone-700', 'shadow-sm');
-        btnHangersNo.classList.remove('text-hint');
-        btnHangersYes.classList.remove('bg-white', 'dark:bg-stone-700', 'shadow-sm');
-        btnHangersYes.classList.add('text-hint');
+        btnHangersNo.classList.add('is-active');
+        btnHangersYes.classList.remove('is-active');
         hangersDetails.classList.add('hidden');
         hangersPriceBadge.textContent = '0 ₽';
-        hangersPriceBadge.className = 'text-[11px] font-semibold px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800 text-hint';
+        hangersPriceBadge.className = 'text-[11px] font-semibold px-2 py-0.5 rounded-md bg-stone-500/10 text-hint';
         render();
       });
 
       btnHangersYes.addEventListener('click', (e) => {
         e.preventDefault();
         state.hasHangers = true;
-        btnHangersYes.classList.add('bg-white', 'dark:bg-stone-700', 'shadow-sm');
-        btnHangersYes.classList.remove('text-hint');
-        btnHangersNo.classList.remove('bg-white', 'dark:bg-stone-700', 'shadow-sm');
-        btnHangersNo.classList.add('text-hint');
+        btnHangersYes.classList.add('is-active');
+        btnHangersNo.classList.remove('is-active');
         hangersDetails.classList.remove('hidden');
         hangersPriceBadge.textContent = '+150 ₽';
-        hangersPriceBadge.className = 'text-[11px] font-semibold px-2 py-0.5 rounded-md bg-wood-500/15 text-wood-700 dark:text-wood-300';
+        hangersPriceBadge.className = 'text-[11px] font-semibold px-2 py-0.5 rounded-md bg-wood-500/15 text-wood-accent';
         render();
       });
 
@@ -1287,20 +1298,19 @@
       btnOrientVert.addEventListener('click', (e) => {
         e.preventDefault();
         state.orientation = 'vertical';
-        setButtonActiveState(btnOrientVert, true);
-        setButtonActiveState(btnOrientHoriz, false);
+        btnOrientVert.classList.add('is-selected');
+        btnOrientHoriz.classList.remove('is-selected');
         render();
       });
 
       btnOrientHoriz.addEventListener('click', (e) => {
         e.preventDefault();
         state.orientation = 'horizontal';
-        setButtonActiveState(btnOrientHoriz, true);
-        setButtonActiveState(btnOrientVert, false);
+        btnOrientHoriz.classList.add('is-selected');
+        btnOrientVert.classList.remove('is-selected');
         render();
       });
 
-      // Кнопка "Скопировать"
       document.getElementById('btn-copy').addEventListener('click', (e) => {
         e.preventDefault();
         const orderText = buildOrderText();
@@ -1308,7 +1318,6 @@
         sendSilentLog('Нажата кнопка «Скопировать»', orderText);
       });
 
-      // Кнопка "Отправить мастеру"
       document.getElementById('btn-send').addEventListener('click', (e) => {
         e.preventDefault();
         const orderText = buildOrderText();
@@ -1330,9 +1339,7 @@
         if (tg && tg.initDataUnsafe && tg.initDataUnsafe.query_id === undefined && typeof tg.sendData === 'function') {
           try {
             tg.sendData(JSON.stringify({ type: 'frame_order', text: orderText, calculation: calculateFrame() }));
-          } catch (err) {
-            // Текст уже скопирован выше
-          }
+          } catch (_) {}
         }
       });
     }
@@ -1341,7 +1348,7 @@
       initTelegram();
       bindEvents();
       syncWoodCardsUI();
-      highlightPresetButtons('.preset-size', 'data-size', `${state.artWidthCm}x${state.artHeightCm}`);
+      syncSelectableGroup('.preset-size', 'data-size', `${state.artWidthCm}x${state.artHeightCm}`);
       render();
     });
   </script>
