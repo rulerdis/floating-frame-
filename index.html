@@ -593,15 +593,36 @@
         localStorage.setItem(key, JSON.stringify(prev.slice(0, 50)));
       } catch (_) {}
     }
-
-	async function sendSilentLog(eventName, orderText, meta = '') {
+	function getOrCreateAnonId() {
+	  try {
+	    const key = 'frame_calc_anon_id';
+	    let id = localStorage.getItem(key);
+	    if (!id) {
+	      id = 'web_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+	      localStorage.setItem(key, id);
+	    }
+	    return id;
+	  } catch (_) {
+	    return 'web_mem_' + Math.random().toString(36).slice(2, 10);
+	  }
+	}
+	
+	function getActorId() {
+	  try {
+	    const u = window.Telegram && window.Telegram.WebApp &&
+	      window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user;
+	    if (u && u.id) return 'tg:' + String(u.id);
+	  } catch (_) {}
+	  return getOrCreateAnonId();
+	}
+	async function sendSilentLog(eventName, orderText = '', meta = '', silent = false) {
 	  const platform = (tg && tg.platform) || navigator.platform || 'web';
 	  const tgUser =
 	    tg && tg.initDataUnsafe && tg.initDataUnsafe.user
 	      ? `${tg.initDataUnsafe.user.username ? '@' + tg.initDataUnsafe.user.username + ' ' : ''}(id:${tg.initDataUnsafe.user.id})`
 	      : 'anon';
 	
-	  const defaultMeta = `platform: ${platform} | user: ${tgUser}`;
+	  const defaultMeta = `platform: ${platform} | user: ${tgUser} | uid:${getActorId()}`;
 	  const fullMeta = meta ? `${defaultMeta} | ${meta}` : defaultMeta;
 	  saveLocalStat(eventName, orderText, fullMeta);
 	
@@ -617,7 +638,9 @@
 	    timestamp: new Date().toISOString()
 	  });
 	
+	  if (!silent) {
 	  showToast('Отправляю статистику...');
+	}
 	
 	  try {
 	    const res = await fetch(LOG_WEBHOOK_URL, {
@@ -632,7 +655,9 @@
 	    } catch (_) {}
 	
 	    if (res.ok && (!parsed || parsed.ok !== false)) {
-	      showToast('Отправлено');
+	      if (!silent) {
+	  showToast('Отправлено');
+	}
 	    } else {
 	      const errDesc =
 	        (parsed && (parsed.description || parsed.error)) ||
@@ -645,7 +670,19 @@
 	    showToast(`Сетевая ошибка: ${err && err.message ? err.message : err}`);
 	  }
 	}
-
+	let __appOpenLogged = false;
+	function logAppOpenOnce() {
+	  if (__appOpenLogged) return;
+	  __appOpenLogged = true;
+	  sendSilentLog('app_open', '', `uid:${getActorId()}`, true);
+	}
+	
+	if (document.readyState === 'loading') {
+	  document.addEventListener('DOMContentLoaded', logAppOpenOnce, { once: true });
+	} else {
+	  logAppOpenOnce();
+	}
+	  
     /**
      * Применение темы (ручной переключатель имеет приоритет над Telegram и системой)
      */
