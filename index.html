@@ -626,7 +626,21 @@
 	      body: jsonStr
 	    });
 	    const rawText = await res.text();
-	    showToast(`Ответ (${res.status}): ${rawText.slice(0, 60)}`);
+	    let parsed = null;
+	    try {
+	      parsed = JSON.parse(rawText);
+	    } catch (_) {}
+	
+	    if (res.ok && (!parsed || parsed.ok !== false)) {
+	      showToast('Отправлено');
+	    } else {
+	      const errDesc =
+	        (parsed && (parsed.description || parsed.error)) ||
+	        rawText.slice(0, 120) ||
+	        `HTTP ${res.status}`;
+	      showToast(`Ошибка отправки: ${errDesc}`);
+	    }
+    
 	  } catch (err) {
 	    showToast(`Сетевая ошибка: ${err && err.message ? err.message : err}`);
 	  }
