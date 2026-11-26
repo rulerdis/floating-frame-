@@ -299,7 +299,7 @@
       <!-- Толщина основы (минимум 15 мм) -->
       <div>
         <div class="flex items-center justify-between mb-1.5">
-          <label for="canvas-thickness" class="text-xs text-hint">Толщина основы (подрамник / борд на подрамнике)</label>
+          <label for="canvas-thickness" class="text-xs text-hint">Толщина основы (холст / артборд)</label>
           <span class="text-xs font-semibold text-wood-accent shrink-0 ml-2" id="canvas-thick-label">20 мм</span>
         </div>
         <div class="grid grid-cols-4 gap-2">
@@ -312,7 +312,7 @@
 
         <!-- Информационное предупреждение про тонкие борды от 6 мм -->
         <div class="mt-2 text-[11px] leading-snug text-hint bg-stone-500/10 rounded-xl px-3 py-2">
-          Для тонких бордов (от 6 мм) саморезы не применяются — они пробьют основу насквозь. Такие заказы обсуждаются индивидуально (клей или дополнительный подрамник).
+          Для бордов без подрамника саморезы не применяются — они пробьют основу насквозь. Заказы на рамы для такой основы обсуждаются индивидуально.
         </div>
       </div>
 
@@ -417,28 +417,10 @@
                 <circle cx="0" cy="8" r="1.2" fill="#d4d4d8" />
               </g>
 
-              <!-- Дополнительные крепления для второго направления (видны при выборе "В оба") -->
-              <g id="hanger-slot-top" transform="translate(172, 16)" opacity="0">
-                <rect x="-12" y="-3.5" width="24" height="7" rx="3.5" fill="#3f3f46" stroke="#18181b" stroke-width="0.8" />
-                <circle cx="-7" cy="0" r="1.2" fill="#d4d4d8" />
-                <circle cx="3.5" cy="0" r="2.1" fill="#18181b" />
-                <rect x="-1.5" y="-1.1" width="5" height="2.2" rx="1" fill="#18181b" />
-                <circle cx="8" cy="0" r="1.2" fill="#d4d4d8" />
-              </g>
-
-              <g id="hanger-slot-bottom" transform="translate(172, 149)" opacity="0">
-                <rect x="-12" y="-3.5" width="24" height="7" rx="3.5" fill="#3f3f46" stroke="#18181b" stroke-width="0.8" />
-                <circle cx="-7" cy="0" r="1.2" fill="#d4d4d8" />
-                <circle cx="3.5" cy="0" r="2.1" fill="#18181b" />
-                <rect x="-1.5" y="-1.1" width="5" height="2.2" rx="1" fill="#18181b" />
-                <circle cx="8" cy="0" r="1.2" fill="#d4d4d8" />
-              </g>
-
               <line id="hanger-level-line" x1="82" y1="47.5" x2="218" y2="47.5" stroke="#0284c7" stroke-width="1" stroke-dasharray="3 2" />
-              <line id="hanger-level-line-2" x1="175.5" y1="2" x2="175.5" y2="160" stroke="#0284c7" stroke-width="1" stroke-dasharray="3 2" opacity="0" />
             </g>
 
-            <text id="hangers-svg-footer" x="150" y="169" text-anchor="middle" font-size="9.5" font-weight="600" fill="#78716c">
+            <text x="150" y="169" text-anchor="middle" font-size="9.5" font-weight="600" fill="#78716c">
               Скрытый фрезерованный паз × 2 шт. (навешивается по уровню)
             </text>
           </svg>
@@ -962,12 +944,8 @@
       const innerRect = document.getElementById('hanger-inner-rect');
       const slotLeft = document.getElementById('hanger-slot-left');
       const slotRight = document.getElementById('hanger-slot-right');
-      const slotTop = document.getElementById('hanger-slot-top');
-      const slotBottom = document.getElementById('hanger-slot-bottom');
       const levelLine = document.getElementById('hanger-level-line');
-      const levelLine2 = document.getElementById('hanger-level-line-2');
       const caption = document.getElementById('hangers-orient-caption');
-      const footerText = document.getElementById('hangers-svg-footer');
 
       outerRect.setAttribute('fill', woodInfo.color);
       outerRect.setAttribute('stroke', woodInfo.stroke);
@@ -998,13 +976,10 @@
         levelLine.setAttribute('y1', '47.5');
         levelLine.setAttribute('x2', '220');
         levelLine.setAttribute('y2', '47.5');
-
-        if (slotTop) slotTop.setAttribute('opacity', '0');
-        if (slotBottom) slotBottom.setAttribute('opacity', '0');
-        if (levelLine2) levelLine2.setAttribute('opacity', '0');
-        if (footerText) footerText.textContent = 'Скрытый фрезерованный паз × 2 шт. (навешивается по уровню)';
-      } else if (state.orientation === 'horizontal') {
-        caption.textContent = 'Горизонтально (альбом)';
+      } else {
+        caption.textContent = state.orientation === 'both'
+          ? 'В оба направления (вертикаль и горизонт)'
+          : 'Горизонтально (альбом)';
         outerRect.setAttribute('x', '65');
         outerRect.setAttribute('y', '24');
         outerRect.setAttribute('width', '170');
@@ -1026,53 +1001,6 @@
         levelLine.setAttribute('y1', '55.5');
         levelLine.setAttribute('x2', '250');
         levelLine.setAttribute('y2', '55.5');
-
-        if (slotTop) slotTop.setAttribute('opacity', '0');
-        if (slotBottom) slotBottom.setAttribute('opacity', '0');
-        if (levelLine2) levelLine2.setAttribute('opacity', '0');
-        if (footerText) footerText.textContent = 'Скрытый фрезерованный паз × 2 шт. (навешивается по уровню)';
-      } else {
-        caption.textContent = 'В оба направления (вертикаль и горизонт)';
-        outerRect.setAttribute('x', '95');
-        outerRect.setAttribute('y', '10');
-        outerRect.setAttribute('width', '110');
-        outerRect.setAttribute('height', '145');
-
-        rebateRect.setAttribute('x', '107');
-        rebateRect.setAttribute('y', '22');
-        rebateRect.setAttribute('width', '86');
-        rebateRect.setAttribute('height', '121');
-
-        innerRect.setAttribute('x', '115');
-        innerRect.setAttribute('y', '30');
-        innerRect.setAttribute('width', '70');
-        innerRect.setAttribute('height', '105');
-
-        // Пара для вертикального подвеса (на левой и правой планке в верхней зоне)
-        slotLeft.setAttribute('transform', 'translate(101, 44)');
-        slotRight.setAttribute('transform', 'translate(199, 44)');
-        levelLine.setAttribute('x1', '80');
-        levelLine.setAttribute('y1', '47.5');
-        levelLine.setAttribute('x2', '220');
-        levelLine.setAttribute('y2', '47.5');
-
-        // Пара для горизонтального подвеса (на верхней и нижней планке, со смещением вправо для симметрии при повороте в альбом)
-        if (slotTop) {
-          slotTop.setAttribute('transform', 'translate(172, 16)');
-          slotTop.setAttribute('opacity', '1');
-        }
-        if (slotBottom) {
-          slotBottom.setAttribute('transform', 'translate(172, 149)');
-          slotBottom.setAttribute('opacity', '1');
-        }
-        if (levelLine2) {
-          levelLine2.setAttribute('x1', '175.5');
-          levelLine2.setAttribute('y1', '2');
-          levelLine2.setAttribute('x2', '175.5');
-          levelLine2.setAttribute('y2', '160');
-          levelLine2.setAttribute('opacity', '1');
-        }
-        if (footerText) footerText.textContent = 'Скрытый фрезерованный паз × 4 шт. (под оба направления)';
       }
     }
 
