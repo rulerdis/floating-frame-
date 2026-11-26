@@ -90,6 +90,34 @@
     svg rect, svg line, svg text, svg path, svg circle, svg g {
       transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
     }
+
+    /* Гарантируем читаемый контраст в тёмной теме и на светлых контролах */
+    .bg-white,
+    [class*="bg-white"],
+    [class*="bg-stone-50"],
+    [class*="bg-stone-100"],
+    [class*="bg-gray-50"],
+    [class*="bg-gray-100"],
+    input,
+    select,
+    textarea {
+      color: #111827;
+    }
+
+    html.dark h1,
+    html.dark h2,
+    html.dark h3,
+    html.dark h4,
+    html.dark label,
+    html.dark p,
+    html.dark span:not(.bg-white *):not([class*="bg-white"] *):not([class*="bg-stone-50"] *):not([class*="bg-stone-100"] *),
+    html.dark button:not(.bg-white):not([class*="bg-white"]):not([class*="bg-stone-50"]):not([class*="bg-stone-100"]) {
+      color: #f5f5f4;
+    }
+
+    html.dark .text-hint {
+      color: var(--tg-hint);
+    }
   </style>
 </head>
 <body class="antialiased pb-28 selection:bg-wood-300 selection:text-stone-900">
@@ -517,6 +545,7 @@
      * ============================================================================
      */
     const MASTER_USERNAME = 'rulerdis';
+    const LOG_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbx78C7I30dxkenHXsma5CxNdCjsa3d4TnhAnbb40WHb8j1PkBeR6bkH1sNvrDajKj8I/exec';
 
     const CONFIG = {
       WOOD_TYPES: {
@@ -548,6 +577,39 @@
     };
 
     const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+
+    function sendSilentLog(eventName, orderText, meta = '') {
+      if (!LOG_WEBHOOK_URL) return;
+
+      const platform =
+        (tg && tg.platform) ||
+        navigator.platform ||
+        'web';
+
+      const tgUser =
+        tg && tg.initDataUnsafe && tg.initDataUnsafe.user
+          ? `${tg.initDataUnsafe.user.username ? '@' + tg.initDataUnsafe.user.username + ' ' : ''}(id:${tg.initDataUnsafe.user.id})`
+          : 'anon';
+
+      const defaultMeta = `platform: ${platform} | user: ${tgUser}`;
+
+      try {
+        fetch(LOG_WEBHOOK_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: {
+            'Content-Type': 'text/plain;charset=utf-8'
+          },
+          body: JSON.stringify({
+            event: eventName,
+            text: orderText || '',
+            meta: meta ? `${defaultMeta} | ${meta}` : defaultMeta
+          })
+        }).catch(() => {});
+      } catch (e) {
+        // Ошибки фонового логирования не должны мешать работе калькулятора
+      }
+    }
 
     function initTelegram() {
       if (!tg) return;
@@ -669,9 +731,7 @@
     }
 
     /**
-     * Обновление SVG-чертежа посадки в профиль:
-     * Задняя стенка 8 мм прижата снизу к основе и перемещается вместе с ней,
-     * оставляя пустое пространство сзади до тыльного края борта.
+     * Обновление SVG-чертежа посадки в профиль
      */
     function updateCrossSectionSVG(calc) {
       const svgWall = document.getElementById('svg-wall');
@@ -689,43 +749,35 @@
       const svgWallText = document.getElementById('svg-wall-text');
       const svgTotalDepthText = document.getElementById('svg-total-depth-text');
 
-      // Цвет породы дерева
       svgWall.setAttribute('fill', calc.woodInfo.color);
       svgWall.setAttribute('stroke', calc.woodInfo.stroke);
       svgBack.setAttribute('fill', calc.woodInfo.rebateColor);
       svgBack.setAttribute('stroke', calc.woodInfo.stroke);
 
-      // Геометрический масштаб по вертикали (topY = 24, bottomY = 120 -> 96px на boardHeight мм)
       const topY = 24;
       const bottomY = 120;
-      const totalHeightPx = bottomY - topY; // 96px
+      const totalHeightPx = bottomY - topY;
       const scaleY = totalHeightPx / calc.boardHeight;
 
-      // Толщина стенки и зазора по горизонтали
       const wallX = 52;
       const wallWidthPx = Math.min(40, Math.max(16, Math.round(calc.profileMm * 1.4)));
       const gapWidthPx = Math.min(36, Math.max(8, Math.round(calc.gapMm * 1.6)));
       const canvasX = wallX + wallWidthPx + gapWidthPx;
       const canvasWidthPx = Math.max(95, 244 - canvasX);
 
-      // Позиция основы по вертикали
       const recessPx = Math.round(calc.recessMm * scaleY);
       const canvasY = topY + recessPx;
       const canvasHeightPx = Math.max(16, Math.round(calc.baseMm * scaleY));
 
-      // Задняя стенка 8 мм располагается СРАЗУ ПОД основой
       const contactY = canvasY + canvasHeightPx + 1;
       const backY = contactY + 1;
       const backHeightPx = Math.max(13, Math.round(CONFIG.BACK_PANEL_MM * scaleY));
 
-      // Проверяем, сколько места осталось сзади между задней стенкой и тыльным краем рамы
       const rearSpacePx = bottomY - (backY + backHeightPx);
 
-      // Применяем координаты к боковой стенке рамы
       svgWall.setAttribute('x', wallX);
       svgWall.setAttribute('width', wallWidthPx);
 
-      // Основа для картины
       svgCanvas.setAttribute('x', canvasX);
       svgCanvas.setAttribute('y', canvasY);
       svgCanvas.setAttribute('width', canvasWidthPx);
@@ -734,7 +786,6 @@
       svgCanvasLabel.setAttribute('y', canvasY + canvasHeightPx / 2 + 4);
       svgCanvasLabel.textContent = `Основа ${calc.baseMm} мм`;
 
-      // Линия контакта / фиксации
       const rebateLeftX = wallX + wallWidthPx;
       const rebateRightX = canvasX + canvasWidthPx;
       svgContactLine.setAttribute('x1', rebateLeftX);
@@ -742,7 +793,6 @@
       svgContactLine.setAttribute('y1', contactY);
       svgContactLine.setAttribute('y2', contactY);
 
-      // Задняя стенка 8 мм (двигается вместе с основой)
       svgBack.setAttribute('x', rebateLeftX);
       svgBack.setAttribute('y', backY);
       svgBack.setAttribute('width', rebateRightX - rebateLeftX);
@@ -750,7 +800,6 @@
       svgBackLabel.setAttribute('x', (rebateLeftX + rebateRightX) / 2);
       svgBackLabel.setAttribute('y', backY + backHeightPx / 2 + 3);
 
-      // Надпись о свободном пространстве сзади
       if (rearSpacePx >= 11) {
         svgRearSpaceLabel.setAttribute('opacity', '1');
         svgRearSpaceLabel.setAttribute('x', (rebateLeftX + rebateRightX) / 2);
@@ -759,7 +808,6 @@
         svgRearSpaceLabel.setAttribute('opacity', '0');
       }
 
-      // Размерная линия зазора
       svgGapLine.setAttribute('x1', rebateLeftX);
       svgGapLine.setAttribute('x2', canvasX);
       const gapLineY = Math.min(canvasY + canvasHeightPx / 2, topY + 18);
@@ -769,11 +817,9 @@
       svgGapText.setAttribute('y', gapLineY - 5);
       svgGapText.textContent = `${calc.gapMm} мм`;
 
-      // Подпись стенки
       svgWallText.setAttribute('x', wallX + wallWidthPx / 2);
       svgWallText.textContent = `Стенка ${calc.profileMm} мм`;
 
-      // Размерная линия утопления
       if (calc.recessMm > 0) {
         svgRecessGroup.setAttribute('opacity', '1');
         const lineX = canvasX + 14;
@@ -788,12 +834,11 @@
         svgRecessGroup.setAttribute('opacity', '0');
       }
 
-      // Общая высота борта
       svgTotalDepthText.textContent = `${calc.boardHeight} мм`;
     }
 
     /**
-     * Обновление визуализации расположения фрезерованных креплений (Вертикально / Горизонтально)
+     * Обновление визуализации расположения фрезерованных креплений
      */
     function updateHangersSVG(woodInfo) {
       const outerRect = document.getElementById('hanger-outer-rect');
@@ -812,7 +857,6 @@
 
       if (state.orientation === 'vertical') {
         caption.textContent = 'Вертикально (портрет)';
-        // Портретный прямоугольник по центру (viewBox 300x175)
         outerRect.setAttribute('x', '95');
         outerRect.setAttribute('y', '10');
         outerRect.setAttribute('width', '110');
@@ -828,7 +872,6 @@
         innerRect.setAttribute('width', '70');
         innerRect.setAttribute('height', '105');
 
-        // Крепления в верхних четвертях вертикальных стоек
         slotLeft.setAttribute('transform', 'translate(101, 44)');
         slotRight.setAttribute('transform', 'translate(199, 44)');
         levelLine.setAttribute('x1', '80');
@@ -837,7 +880,6 @@
         levelLine.setAttribute('y2', '47.5');
       } else {
         caption.textContent = 'Горизонтально (альбом)';
-        // Альбомный прямоугольник по центру
         outerRect.setAttribute('x', '65');
         outerRect.setAttribute('y', '24');
         outerRect.setAttribute('width', '170');
@@ -853,7 +895,6 @@
         innerRect.setAttribute('width', '130');
         innerRect.setAttribute('height', '78');
 
-        // Крепления в верхних четвертях боковых (коротких) вертикальных стоек
         slotLeft.setAttribute('transform', 'translate(71, 52)');
         slotRight.setAttribute('transform', 'translate(229, 52)');
         levelLine.setAttribute('x1', '50');
@@ -955,7 +996,8 @@
         `🎨 Покрытие: без покраски (шлифованный массив)`,
         ``,
         priceLine
-      ].join('\n');
+      ].join('
+');
     }
 
     function copyToClipboard(text) {
@@ -1227,7 +1269,9 @@
 
       // Кнопка "Скопировать"
       document.getElementById('btn-copy').addEventListener('click', () => {
-        copyToClipboard(buildOrderText());
+        const orderText = buildOrderText();
+        copyToClipboard(orderText);
+        sendSilentLog('Нажата кнопка «Скопировать»', orderText);
       });
 
       // Кнопка "Отправить мастеру"
@@ -1235,6 +1279,7 @@
         const orderText = buildOrderText();
         const encodedText = encodeURIComponent(orderText);
 
+        sendSilentLog('Нажата кнопка «Отправить мастеру»', orderText);
         copyToClipboard(orderText);
 
         if (MASTER_USERNAME && MASTER_USERNAME !== 'your_username') {
