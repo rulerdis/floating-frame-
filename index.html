@@ -90,34 +90,6 @@
     svg rect, svg line, svg text, svg path, svg circle, svg g {
       transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
     }
-
-    /* Гарантируем читаемый контраст в тёмной теме и на светлых контролах */
-    .bg-white,
-    [class*="bg-white"],
-    [class*="bg-stone-50"],
-    [class*="bg-stone-100"],
-    [class*="bg-gray-50"],
-    [class*="bg-gray-100"],
-    input,
-    select,
-    textarea {
-      color: #111827;
-    }
-
-    html.dark h1,
-    html.dark h2,
-    html.dark h3,
-    html.dark h4,
-    html.dark label,
-    html.dark p,
-    html.dark span:not(.bg-white *):not([class*="bg-white"] *):not([class*="bg-stone-50"] *):not([class*="bg-stone-100"] *),
-    html.dark button:not(.bg-white):not([class*="bg-white"]):not([class*="bg-stone-50"]):not([class*="bg-stone-100"]) {
-      color: #f5f5f4;
-    }
-
-    html.dark .text-hint {
-      color: var(--tg-hint);
-    }
   </style>
 </head>
 <body class="antialiased pb-28 selection:bg-wood-300 selection:text-stone-900">
@@ -573,7 +545,8 @@
       isRecessed: false,
       recessDepthMm: 5,
       hasHangers: false,
-      orientation: 'vertical' // 'vertical' | 'horizontal'
+      orientation: 'vertical', // 'vertical' | 'horizontal'
+      manualTheme: null // null | 'dark' | 'light'
     };
 
     const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
@@ -611,28 +584,48 @@
       }
     }
 
+    function applyThemeState() {
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const tgDark = tg && tg.colorScheme === 'dark';
+      const isDark = state.manualTheme !== null
+        ? state.manualTheme === 'dark'
+        : Boolean(tgDark || (!tg && prefersDark));
+
+      document.documentElement.classList.toggle('dark', isDark);
+
+      if (tg && tg.themeParams) {
+        if (!isDark && tg.themeParams.bg_color) {
+          document.documentElement.style.setProperty('--tg-bg', tg.themeParams.bg_color);
+        } else if (isDark) {
+          document.documentElement.style.setProperty('--tg-bg', '#141312');
+        } else {
+          document.documentElement.style.setProperty('--tg-bg', '#f6f5f2');
+        }
+
+        if (!isDark && tg.themeParams.secondary_bg_color) {
+          document.documentElement.style.setProperty('--tg-secondary-bg', tg.themeParams.secondary_bg_color);
+        } else if (isDark) {
+          document.documentElement.style.setProperty('--tg-secondary-bg', '#1f1d1b');
+        } else {
+          document.documentElement.style.setProperty('--tg-secondary-bg', '#ffffff');
+        }
+      }
+    }
+
     function initTelegram() {
-      if (!tg) return;
+      if (!tg) {
+        applyThemeState();
+        return;
+      }
       try {
         tg.ready();
         tg.expand();
-
-        const applyTgTheme = () => {
-          if (tg.colorScheme === 'dark') {
-            document.documentElement.classList.add('dark');
-          } else if (tg.colorScheme === 'light') {
-            document.documentElement.classList.remove('dark');
+        applyThemeState();
+        tg.onEvent('themeChanged', () => {
+          if (state.manualTheme === null) {
+            applyThemeState();
           }
-          if (tg.themeParams && tg.themeParams.bg_color) {
-            document.documentElement.style.setProperty('--tg-bg', tg.themeParams.bg_color);
-          }
-          if (tg.themeParams && tg.themeParams.secondary_bg_color) {
-            document.documentElement.style.setProperty('--tg-secondary-bg', tg.themeParams.secondary_bg_color);
-          }
-        };
-
-        applyTgTheme();
-        tg.onEvent('themeChanged', applyTgTheme);
+        });
       } catch (e) {
         console.warn('Telegram WebApp init warning:', e);
       }
@@ -996,44 +989,90 @@
         `🎨 Покрытие: без покраски (шлифованный массив)`,
         ``,
         priceLine
-      ].join('
-');
+      ].join('\n');
     }
 
     function copyToClipboard(text) {
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+        navigator.clipboard.writeText(text)
+          .then(() => showToast('Расчёт скопирован! Вставьте в чат с мастером'))
+          .catch(() => fallbackCopy(text));
+        return;
+      }
+      fallbackCopy(text);
+    }
+
+    function fallbackCopy(text) {
       const textarea = document.createElement('textarea');
       textarea.value = text;
+      textarea.setAttribute('readonly', '');
       textarea.style.position = 'fixed';
-      textarea.style.opacity = '0';
+      textarea.style.top = '0';
+      textarea.style.left = '0';
+      textarea.style.opacity = '0.01';
       document.body.appendChild(textarea);
       textarea.focus();
       textarea.select();
       try {
-        document.execCommand('copy');
-        showToast('Расчёт скопирован! Вставьте в чат с мастером');
+        const ok = document.execCommand('copy');
+        showToast(ok ? 'Расчёт скопирован! Вставьте в чат с мастером' : 'Не удалось скопировать текст');
       } catch (err) {
         showToast('Не удалось скопировать текст');
       }
       document.body.removeChild(textarea);
     }
 
+    function setButtonActiveState(btn, isActive) {
+      if (!btn) return;
+      if (isActive) {
+        btn.classList.remove('border', 'border-stone-200', 'dark:border-stone-700');
+        btn.classList.add('border-2', 'border-wood-600', 'bg-wood-500/10', 'font-medium', 'text-wood-700', 'dark:text-wood-300');
+      } else {
+        btn.classList.remove('border-2', 'border-wood-600', 'bg-wood-500/10', 'font-medium', 'text-wood-700', 'dark:text-wood-300');
+        btn.classList.add('border', 'border-stone-200', 'dark:border-stone-700');
+      }
+    }
+
     function highlightPresetButtons(selector, attrName, activeValue) {
       document.querySelectorAll(selector).forEach((btn) => {
         const val = btn.getAttribute(attrName);
-        if (String(val) === String(activeValue)) {
-          btn.classList.remove('border', 'border-stone-200', 'dark:border-stone-700');
-          btn.classList.add('border-2', 'border-wood-600', 'bg-wood-500/10', 'text-wood-700', 'dark:text-wood-300');
+        setButtonActiveState(btn, String(val) === String(activeValue));
+      });
+    }
+
+    function syncWoodCardsUI() {
+      document.querySelectorAll('.wood-card').forEach((card) => {
+        const isSelected = card.getAttribute('data-wood') === state.wood;
+        const priceSpan = card.querySelector('span:last-child');
+        card.classList.toggle('active', isSelected);
+        if (isSelected) {
+          card.classList.remove('border', 'border-stone-200', 'dark:border-stone-700');
+          card.classList.add('border-2', 'border-wood-600', 'bg-wood-500/10');
+          if (priceSpan) {
+            priceSpan.classList.remove('text-hint');
+            priceSpan.classList.add('text-wood-700', 'dark:text-wood-300');
+          }
         } else {
-          btn.classList.remove('border-2', 'border-wood-600', 'bg-wood-500/10', 'text-wood-700', 'dark:text-wood-300');
-          btn.classList.add('border', 'border-stone-200', 'dark:border-stone-700');
+          card.classList.remove('border-2', 'border-wood-600', 'bg-wood-500/10');
+          card.classList.add('border', 'border-stone-200', 'dark:border-stone-700');
+          if (priceSpan) {
+            priceSpan.classList.remove('text-wood-700', 'dark:text-wood-300');
+            priceSpan.classList.add('text-hint');
+          }
         }
       });
     }
 
     function bindEvents() {
-      document.getElementById('theme-toggle').addEventListener('click', () => {
-        document.documentElement.classList.toggle('dark');
-      });
+      const themeToggle = document.getElementById('theme-toggle');
+      if (themeToggle) {
+        themeToggle.addEventListener('click', (e) => {
+          e.preventDefault();
+          const currentlyDark = document.documentElement.classList.contains('dark');
+          state.manualTheme = currentlyDark ? 'light' : 'dark';
+          applyThemeState();
+        });
+      }
 
       // Ширина и высота основы
       const widthInput = document.getElementById('art-width');
@@ -1052,7 +1091,8 @@
       });
 
       document.querySelectorAll('.preset-size').forEach((btn) => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
           const [w, h] = btn.getAttribute('data-size').split('x');
           state.artWidthCm = Number(w);
           state.artHeightCm = Number(h);
@@ -1065,23 +1105,10 @@
 
       // Порода дерева
       document.querySelectorAll('.wood-card').forEach((card) => {
-        card.addEventListener('click', () => {
+        card.addEventListener('click', (e) => {
+          e.preventDefault();
           state.wood = card.getAttribute('data-wood');
-          document.querySelectorAll('.wood-card').forEach((c) => {
-            const isSelected = c.getAttribute('data-wood') === state.wood;
-            const priceSpan = c.querySelector('span:last-child');
-            if (isSelected) {
-              c.classList.remove('border', 'border-stone-200', 'dark:border-stone-700');
-              c.classList.add('border-2', 'border-wood-600', 'bg-wood-500/10');
-              priceSpan.classList.remove('text-hint');
-              priceSpan.classList.add('text-wood-700', 'dark:text-wood-300');
-            } else {
-              c.classList.remove('border-2', 'border-wood-600', 'bg-wood-500/10');
-              c.classList.add('border', 'border-stone-200', 'dark:border-stone-700');
-              priceSpan.classList.remove('text-wood-700', 'dark:text-wood-300');
-              priceSpan.classList.add('text-hint');
-            }
-          });
+          syncWoodCardsUI();
           render();
         });
       });
@@ -1089,7 +1116,8 @@
       // Толщина стенки профиля (min 8, max 40)
       const profileInput = document.getElementById('profile-thickness');
       document.querySelectorAll('.preset-profile').forEach((btn) => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
           const val = Number(btn.getAttribute('data-profile'));
           state.profileThicknessMm = val;
           profileInput.value = val;
@@ -1115,7 +1143,8 @@
       // Зазор (СТРОГИЙ МИНИМУМ 3 мм)
       const gapInput = document.getElementById('gap-size');
       document.querySelectorAll('.preset-gap').forEach((btn) => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
           const val = Math.max(CONFIG.MIN_GAP_MM, Number(btn.getAttribute('data-gap')));
           state.gapMm = val;
           gapInput.value = val;
@@ -1147,7 +1176,8 @@
       // Толщина основы для картины (СТРОГИЙ МИНИМУМ 15 мм)
       const canvasInput = document.getElementById('canvas-thickness');
       document.querySelectorAll('.preset-canvas').forEach((btn) => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
           const val = Math.max(CONFIG.MIN_BASE_THICK_MM, Number(btn.getAttribute('data-canvas')));
           state.baseThicknessMm = val;
           canvasInput.value = val;
@@ -1178,7 +1208,8 @@
       const btnRecessed = document.getElementById('fit-recessed');
       const recessControls = document.getElementById('recess-controls');
 
-      btnFlush.addEventListener('click', () => {
+      btnFlush.addEventListener('click', (e) => {
+        e.preventDefault();
         state.isRecessed = false;
         btnFlush.classList.add('bg-white', 'dark:bg-stone-700', 'shadow-sm');
         btnFlush.classList.remove('text-hint');
@@ -1188,7 +1219,8 @@
         render();
       });
 
-      btnRecessed.addEventListener('click', () => {
+      btnRecessed.addEventListener('click', (e) => {
+        e.preventDefault();
         state.isRecessed = true;
         btnRecessed.classList.add('bg-white', 'dark:bg-stone-700', 'shadow-sm');
         btnRecessed.classList.remove('text-hint');
@@ -1201,7 +1233,8 @@
       // Глубина утопления
       const recessInput = document.getElementById('recess-depth');
       document.querySelectorAll('.preset-recess').forEach((btn) => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
           const val = Number(btn.getAttribute('data-recess'));
           state.recessDepthMm = val;
           recessInput.value = val;
@@ -1222,7 +1255,8 @@
       const hangersDetails = document.getElementById('hangers-details');
       const hangersPriceBadge = document.getElementById('hangers-price-badge');
 
-      btnHangersNo.addEventListener('click', () => {
+      btnHangersNo.addEventListener('click', (e) => {
+        e.preventDefault();
         state.hasHangers = false;
         btnHangersNo.classList.add('bg-white', 'dark:bg-stone-700', 'shadow-sm');
         btnHangersNo.classList.remove('text-hint');
@@ -1234,7 +1268,8 @@
         render();
       });
 
-      btnHangersYes.addEventListener('click', () => {
+      btnHangersYes.addEventListener('click', (e) => {
+        e.preventDefault();
         state.hasHangers = true;
         btnHangersYes.classList.add('bg-white', 'dark:bg-stone-700', 'shadow-sm');
         btnHangersYes.classList.remove('text-hint');
@@ -1249,33 +1284,33 @@
       const btnOrientVert = document.getElementById('orient-vertical');
       const btnOrientHoriz = document.getElementById('orient-horizontal');
 
-      btnOrientVert.addEventListener('click', () => {
+      btnOrientVert.addEventListener('click', (e) => {
+        e.preventDefault();
         state.orientation = 'vertical';
-        btnOrientVert.classList.remove('border', 'border-stone-200', 'dark:border-stone-700');
-        btnOrientVert.classList.add('border-2', 'border-wood-600', 'bg-wood-500/10', 'text-wood-700', 'dark:text-wood-300');
-        btnOrientHoriz.classList.remove('border-2', 'border-wood-600', 'bg-wood-500/10', 'text-wood-700', 'dark:text-wood-300');
-        btnOrientHoriz.classList.add('border', 'border-stone-200', 'dark:border-stone-700');
+        setButtonActiveState(btnOrientVert, true);
+        setButtonActiveState(btnOrientHoriz, false);
         render();
       });
 
-      btnOrientHoriz.addEventListener('click', () => {
+      btnOrientHoriz.addEventListener('click', (e) => {
+        e.preventDefault();
         state.orientation = 'horizontal';
-        btnOrientHoriz.classList.remove('border', 'border-stone-200', 'dark:border-stone-700');
-        btnOrientHoriz.classList.add('border-2', 'border-wood-600', 'bg-wood-500/10', 'text-wood-700', 'dark:text-wood-300');
-        btnOrientVert.classList.remove('border-2', 'border-wood-600', 'bg-wood-500/10', 'text-wood-700', 'dark:text-wood-300');
-        btnOrientVert.classList.add('border', 'border-stone-200', 'dark:border-stone-700');
+        setButtonActiveState(btnOrientHoriz, true);
+        setButtonActiveState(btnOrientVert, false);
         render();
       });
 
       // Кнопка "Скопировать"
-      document.getElementById('btn-copy').addEventListener('click', () => {
+      document.getElementById('btn-copy').addEventListener('click', (e) => {
+        e.preventDefault();
         const orderText = buildOrderText();
         copyToClipboard(orderText);
         sendSilentLog('Нажата кнопка «Скопировать»', orderText);
       });
 
       // Кнопка "Отправить мастеру"
-      document.getElementById('btn-send').addEventListener('click', () => {
+      document.getElementById('btn-send').addEventListener('click', (e) => {
+        e.preventDefault();
         const orderText = buildOrderText();
         const encodedText = encodeURIComponent(orderText);
 
@@ -1295,7 +1330,7 @@
         if (tg && tg.initDataUnsafe && tg.initDataUnsafe.query_id === undefined && typeof tg.sendData === 'function') {
           try {
             tg.sendData(JSON.stringify({ type: 'frame_order', text: orderText, calculation: calculateFrame() }));
-          } catch (e) {
+          } catch (err) {
             // Текст уже скопирован выше
           }
         }
@@ -1305,6 +1340,8 @@
     window.addEventListener('DOMContentLoaded', () => {
       initTelegram();
       bindEvents();
+      syncWoodCardsUI();
+      highlightPresetButtons('.preset-size', 'data-size', `${state.artWidthCm}x${state.artHeightCm}`);
       render();
     });
   </script>
