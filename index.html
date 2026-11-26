@@ -399,6 +399,7 @@
               <rect id="hanger-rebate-rect" x="107" y="22" width="86" height="121" rx="1" fill="#b5844f" stroke="#7f5433" stroke-width="1" />
               <rect id="hanger-inner-rect" x="115" y="30" width="70" height="105" rx="1" fill="#f5f5f4" stroke="#7f5433" stroke-width="1" />
 
+              <!-- Паз слева -->
               <g id="hanger-slot-left" transform="translate(101, 44)">
                 <rect x="-3.5" y="-12" width="7" height="24" rx="3.5" fill="#3f3f46" stroke="#18181b" stroke-width="0.8" />
                 <circle cx="0" cy="-7" r="1.2" fill="#d4d4d8" />
@@ -407,6 +408,7 @@
                 <circle cx="0" cy="8" r="1.2" fill="#d4d4d8" />
               </g>
 
+              <!-- Паз справа -->
               <g id="hanger-slot-right" transform="translate(199, 44)">
                 <rect x="-3.5" y="-12" width="7" height="24" rx="3.5" fill="#3f3f46" stroke="#18181b" stroke-width="0.8" />
                 <circle cx="0" cy="-7" r="1.2" fill="#d4d4d8" />
@@ -415,10 +417,28 @@
                 <circle cx="0" cy="8" r="1.2" fill="#d4d4d8" />
               </g>
 
+              <!-- Дополнительные пазы сверху и снизу для режима «В оба» -->
+              <g id="hanger-slot-top" opacity="0" transform="translate(150, 30) rotate(90)">
+                <rect x="-3.5" y="-12" width="7" height="24" rx="3.5" fill="#3f3f46" stroke="#18181b" stroke-width="0.8" />
+                <circle cx="0" cy="-7" r="1.2" fill="#d4d4d8" />
+                <circle cx="0" cy="3.5" r="2.1" fill="#18181b" />
+                <rect x="-1.1" y="-1.5" width="2.2" height="5" rx="1" fill="#18181b" />
+                <circle cx="0" cy="8" r="1.2" fill="#d4d4d8" />
+              </g>
+
+              <g id="hanger-slot-bottom" opacity="0" transform="translate(150, 136) rotate(90)">
+                <rect x="-3.5" y="-12" width="7" height="24" rx="3.5" fill="#3f3f46" stroke="#18181b" stroke-width="0.8" />
+                <circle cx="0" cy="-7" r="1.2" fill="#d4d4d8" />
+                <circle cx="0" cy="3.5" r="2.1" fill="#18181b" />
+                <rect x="-1.1" y="-1.5" width="2.2" height="5" rx="1" fill="#18181b" />
+                <circle cx="0" cy="8" r="1.2" fill="#d4d4d8" />
+              </g>
+
               <line id="hanger-level-line" x1="82" y1="47.5" x2="218" y2="47.5" stroke="#0284c7" stroke-width="1" stroke-dasharray="3 2" />
+              <line id="hanger-level-line-alt" opacity="0" x1="153.5" y1="12" x2="153.5" y2="154" stroke="#0284c7" stroke-width="1" stroke-dasharray="3 2" />
             </g>
 
-            <text x="150" y="169" text-anchor="middle" font-size="9.5" font-weight="600" fill="#78716c">
+            <text id="hanger-footer-caption" x="150" y="169" text-anchor="middle" font-size="9.5" font-weight="600" fill="#78716c">
               Скрытый фрезерованный паз × 2 шт. (навешивается по уровню)
             </text>
           </svg>
@@ -804,8 +824,8 @@
         isCustomOnly = true;
       }
 
-      const profileMultiplier = calc.profileMm >= 20 ? 1.20 : 1.0;
-      const profileSurchargePercent = calc.profileMm >= 20 ? 20 : 0;
+      const profileMultiplier = profileMm >= 20 ? 1.20 : 1.0;
+      const profileSurchargePercent = profileMm >= 20 ? 20 : 0;
 
       const woodInfo = CONFIG.WOOD_TYPES[state.wood];
       const rawFrameCost = perimeter * woodInfo.price * depthMultiplier * profileMultiplier;
@@ -947,8 +967,12 @@
       const innerRect = document.getElementById('hanger-inner-rect');
       const slotLeft = document.getElementById('hanger-slot-left');
       const slotRight = document.getElementById('hanger-slot-right');
+      const slotTop = document.getElementById('hanger-slot-top');
+      const slotBottom = document.getElementById('hanger-slot-bottom');
       const levelLine = document.getElementById('hanger-level-line');
+      const levelLineAlt = document.getElementById('hanger-level-line-alt');
       const caption = document.getElementById('hangers-orient-caption');
+      const footerCaption = document.getElementById('hanger-footer-caption');
 
       outerRect.setAttribute('fill', woodInfo.color);
       outerRect.setAttribute('stroke', woodInfo.stroke);
@@ -956,8 +980,14 @@
       rebateRect.setAttribute('stroke', woodInfo.stroke);
       innerRect.setAttribute('stroke', woodInfo.stroke);
 
+      const isBoth = state.orientation === 'both';
+      slotTop.setAttribute('opacity', isBoth ? '1' : '0');
+      slotBottom.setAttribute('opacity', isBoth ? '1' : '0');
+      levelLineAlt.setAttribute('opacity', isBoth ? '0.85' : '0');
+
       if (state.orientation === 'vertical') {
         caption.textContent = 'Вертикально (портрет)';
+        footerCaption.textContent = 'Скрытый фрезерованный паз × 2 шт. (навешивается по уровню)';
         outerRect.setAttribute('x', '95');
         outerRect.setAttribute('y', '10');
         outerRect.setAttribute('width', '110');
@@ -979,10 +1009,9 @@
         levelLine.setAttribute('y1', '47.5');
         levelLine.setAttribute('x2', '220');
         levelLine.setAttribute('y2', '47.5');
-      } else {
-        caption.textContent = state.orientation === 'both'
-          ? 'В оба направления (вертикаль и горизонт)'
-          : 'Горизонтально (альбом)';
+      } else if (state.orientation === 'horizontal') {
+        caption.textContent = 'Горизонтально (альбом)';
+        footerCaption.textContent = 'Скрытый фрезерованный паз × 2 шт. (навешивается по уровню)';
         outerRect.setAttribute('x', '65');
         outerRect.setAttribute('y', '24');
         outerRect.setAttribute('width', '170');
@@ -1004,6 +1033,37 @@
         levelLine.setAttribute('y1', '55.5');
         levelLine.setAttribute('x2', '250');
         levelLine.setAttribute('y2', '55.5');
+      } else {
+        caption.textContent = 'В оба направления (вертикаль и горизонт)';
+        footerCaption.textContent = 'Скрытые пазы под оба положения (+50 ₽)';
+        outerRect.setAttribute('x', '82');
+        outerRect.setAttribute('y', '16');
+        outerRect.setAttribute('width', '136');
+        outerRect.setAttribute('height', '136');
+
+        rebateRect.setAttribute('x', '94');
+        rebateRect.setAttribute('y', '28');
+        rebateRect.setAttribute('width', '112');
+        rebateRect.setAttribute('height', '112');
+
+        innerRect.setAttribute('x', '102');
+        innerRect.setAttribute('y', '36');
+        innerRect.setAttribute('width', '96');
+        innerRect.setAttribute('height', '96');
+
+        slotLeft.setAttribute('transform', 'translate(88, 52)');
+        slotRight.setAttribute('transform', 'translate(212, 52)');
+        levelLine.setAttribute('x1', '68');
+        levelLine.setAttribute('y1', '55.5');
+        levelLine.setAttribute('x2', '232');
+        levelLine.setAttribute('y2', '55.5');
+
+        slotTop.setAttribute('transform', 'translate(166, 22) rotate(90)');
+        slotBottom.setAttribute('transform', 'translate(166, 146) rotate(90)');
+        levelLineAlt.setAttribute('x1', '169.5');
+        levelLineAlt.setAttribute('y1', '6');
+        levelLineAlt.setAttribute('x2', '169.5');
+        levelLineAlt.setAttribute('y2', '158');
       }
     }
 
