@@ -57,6 +57,46 @@
     </div>
   </div>
 
+
+  <!-- Модальное окно: Условия заказа и расчёта -->
+  <div id="terms-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+    <div class="card-surface w-full max-w-lg max-h-[85vh] rounded-2xl shadow-xl flex flex-col overflow-hidden">
+      <div class="flex items-center justify-between px-4 py-3.5 border-b border-stone-500/20">
+        <h3 class="text-sm font-bold">Условия заказа и расчёта</h3>
+        <button id="terms-close" type="button" aria-label="Закрыть" class="p-1.5 rounded-lg text-hint hover:opacity-80">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="p-4 overflow-y-auto space-y-3 text-xs leading-relaxed text-hint">
+        <p class="font-semibold" style="color: var(--tg-text);">1. Предварительность расчёта</p>
+        <p>Расчёт в Калькуляторе носит справочный и предварительный характер и не является публичной офертой. Итоговая стоимость, наличие материала и возможность изготовления фиксируются при согласовании заказа с мастером.</p>
+
+        <p class="font-semibold" style="color: var(--tg-text);">2. Изготовление на заказ и особенности материала</p>
+        <p>Исполнитель: Индивидуальный предприниматель Сухинин Денис Сергеевич, ИНН <span class="font-medium" style="color: var(--tg-text);">550411214396</span> (e-mail: <span class="font-medium" style="color: var(--tg-text);">deanan-torg@yandex.ru</span>, Telegram: <span class="font-medium" style="color: var(--tg-text);">@rulerdis</span>).</p>
+        <ul class="list-disc pl-5 space-y-1">
+          <li>рамы изготавливаются из натурального массива (бук, ясень, дуб) без покраски — шлифованный массив, готовый под самостоятельное покрытие;</li>
+          <li>натуральная древесина допускает естественные вариации оттенка, текстуры и влажностного расширения/сужения;</li>
+          <li>параметры с глубиной сверх стандартного вылета пильного диска либо тонкие основы без подрамника согласовываются индивидуально.</li>
+        </ul>
+
+        <p class="font-semibold" style="color: var(--tg-text);">3. Оформление, сроки и доставка</p>
+        <p>Для уточнения заказа сформированный расчёт можно скопировать или отправить в личные сообщения в Telegram. Сроки изготовления, порядок оплаты и способ получения (самовывоз или доставка) согласовываются индивидуально до запуска изделия в работу.</p>
+
+        <p class="font-semibold" style="color: var(--tg-text);">4. Изделия с индивидуальными параметрами</p>
+        <p>Рамы изготавливаются по заданным клиентом размерам и конфигурациям и имеют индивидуально-определённые свойства. Вопросы замены, доработки или возврата при выявлении брака либо расхождений с согласованными параметрами решаются напрямую с мастером.</p>
+      </div>
+
+      <div class="px-4 py-3 border-t border-stone-500/20 flex justify-end">
+        <button id="terms-ok" type="button" class="px-4 py-2 rounded-xl bg-wood-600 hover:bg-wood-700 text-white text-xs font-semibold">
+          Понятно
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -294,6 +334,21 @@
         <button type="button" data-size="60x80" class="preset-size selectable-item text-xs px-2.5 py-1.5 rounded-lg">60×80</button>
         <button type="button" data-size="80x100" class="preset-size selectable-item text-xs px-2.5 py-1.5 rounded-lg">80×100</button>
       </div>
+
+      <!-- Количество рам данного размера -->
+      <div class="pt-2.5 border-t border-stone-500/15 flex items-center justify-between gap-3">
+        <div>
+          <label for="frame-qty" class="block text-xs font-medium">Количество рам этого размера</label>
+          <span class="text-[11px] text-hint">Если нужно несколько одинаковых</span>
+        </div>
+        <div class="flex items-center gap-1.5 shrink-0">
+          <button id="qty-minus" type="button" aria-label="Уменьшить количество" class="w-9 h-9 rounded-xl selectable-item flex items-center justify-center text-base font-bold active:scale-95">−</button>
+          <input id="frame-qty" type="number" inputmode="numeric" min="1" max="99" step="1" value="1"
+            class="w-14 h-9 rounded-xl border text-center text-sm font-bold focus:outline-none focus:ring-2 focus:ring-wood-500" />
+          <button id="qty-plus" type="button" aria-label="Увеличить количество" class="w-9 h-9 rounded-xl selectable-item flex items-center justify-center text-base font-bold active:scale-95">+</button>
+        </div>
+      </div>
+
     </section>
 
     <!-- 3. Профиль и технологический зазор -->
@@ -549,6 +604,50 @@
       </div>
     </section>
 
+    <!-- Отдельный блок комментария к позиции -->
+    <section id="item-comment-section" class="card-surface rounded-2xl p-4 shadow-sm space-y-2">
+      <div class="flex items-center justify-between">
+        <label for="item-comment" class="text-sm font-semibold">Комментарий к позиции <span class="text-xs font-normal text-hint">(необязательно)</span></label>
+        <span id="item-comment-counter" class="text-[11px] text-hint">0/120</span>
+      </div>
+      <input id="item-comment" type="text" maxlength="120" placeholder="Пожелания или нюансы по раме/основе"
+        style="background-color: var(--tg-bg); color: var(--tg-text); border-color: var(--tg-border);"
+        class="w-full rounded-xl border px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-wood-500 transition" />
+    </section>
+
+    <!-- Список позиций заказа (для нескольких рам разных размеров/параметров) -->
+    <section id="order-items-section" class="card-surface rounded-2xl p-4 shadow-sm space-y-3">
+      <div class="flex items-center justify-between gap-2">
+        <div>
+          <h2 class="text-sm font-semibold">Список позиций в заказе</h2>
+          <p class="text-[11px] text-hint">Нужны разные размеры или породы? Добавьте каждую позицию в список</p>
+        </div>
+        <button id="btn-add-item" type="button" class="px-3 py-2 rounded-xl selectable-item is-selected text-xs font-semibold shrink-0 active:scale-[0.98]">
+          + Добавить раму
+        </button>
+      </div>
+
+      <div id="editing-item-banner" class="hidden rounded-xl border border-amber-500/35 bg-amber-500/10 px-3 py-2 flex items-center justify-between gap-2 text-xs">
+        <span id="editing-item-label" class="font-medium text-amber-600">Редактирование позиции №1</span>
+        <button id="btn-cancel-edit" type="button" class="underline text-[11px] font-semibold text-hint hover:opacity-80 shrink-0">
+          Отменить
+        </button>
+      </div>
+
+      <div id="order-items-empty" class="text-xs text-hint bg-stone-500/5 border border-dashed border-stone-500/20 rounded-xl p-3 text-center">
+        Список пока пуст — в расчёте участвует текущая рама. Нажмите <strong>«+ Добавить раму»</strong>, чтобы собрать заказ из нескольких разных позиций.
+      </div>
+
+      <div id="order-items-list" class="hidden space-y-2"></div>
+
+      <div id="order-items-actions" class="hidden pt-1 flex items-center justify-between text-[11px] text-hint">
+        <span id="order-items-count-summary">Позиций: 0</span>
+        <button id="btn-clear-items" type="button" class="underline text-rose-500 hover:opacity-80 font-medium">
+          Очистить список
+        </button>
+      </div>
+    </section>
+
     <!-- 7. Итоговый расчёт -->
     <section id="result-card" class="card-surface rounded-2xl p-4 shadow-md space-y-3">
       <div id="price-valid-block">
@@ -588,9 +687,14 @@
         </svg>
         <div class="space-y-1">
           <p>Рама поставляется без покраски (шлифованный массив, готовый под любое покрытие). Расчёт предварительный, уточняется при заказе.</p>
-          <button id="btn-open-privacy" type="button" class="underline text-wood-accent hover:opacity-80 font-medium">
-            Политика конфиденциальности
-          </button>
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-1 pt-0.5">
+            <button id="btn-open-privacy" type="button" class="underline text-wood-accent hover:opacity-80 font-medium">
+              Политика конфиденциальности
+            </button>
+            <button id="btn-open-terms" type="button" class="underline text-wood-accent hover:opacity-80 font-medium">
+              Условия заказа и расчёта
+            </button>
+          </div>
         </div>
       </div>
     </section>
@@ -648,8 +752,31 @@
       recessDepthMm: 5,
       hasHangers: false,
       orientation: 'vertical',
+      quantity: 1,
+      itemComment: '',
+      orderItems: [],
+      editingItemId: null,
       manualTheme: null // null | 'dark' | 'light'
     };
+
+    const ORDER_ITEMS_STORAGE_KEY = 'canvas_calc_order_items_v1';
+
+    function saveOrderItemsToStorage() {
+      try {
+        localStorage.setItem(ORDER_ITEMS_STORAGE_KEY, JSON.stringify(state.orderItems || []));
+      } catch (_) {}
+    }
+
+    function loadOrderItemsFromStorage() {
+      try {
+        const raw = localStorage.getItem(ORDER_ITEMS_STORAGE_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          state.orderItems = parsed.filter((it) => it && typeof it === 'object' && it.id);
+        }
+      } catch (_) {}
+    }
 
     const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 
@@ -835,13 +962,14 @@
       }, 2800);
     }
 
-    function calculateFrame() {
-      const widthCm = Math.max(1, parseFloat(state.artWidthCm) || 0);
-      const heightCm = Math.max(1, parseFloat(state.artHeightCm) || 0);
-      const profileMm = Math.max(8, parseFloat(state.profileThicknessMm) || 15);
-      const gapMm = Math.max(CONFIG.MIN_GAP_MM, parseFloat(state.gapMm) || CONFIG.MIN_GAP_MM);
-      const baseMm = Math.max(CONFIG.MIN_BASE_THICK_MM, parseFloat(state.baseThicknessMm) || CONFIG.MIN_BASE_THICK_MM);
-      const recessMm = state.isRecessed ? Math.max(1, parseFloat(state.recessDepthMm) || 0) : 0;
+    function calculateFrame(srcState = state) {
+      const widthCm = Math.max(1, parseFloat(srcState.artWidthCm) || 0);
+      const heightCm = Math.max(1, parseFloat(srcState.artHeightCm) || 0);
+      const profileMm = Math.max(8, parseFloat(srcState.profileThicknessMm) || 15);
+      const gapMm = Math.max(CONFIG.MIN_GAP_MM, parseFloat(srcState.gapMm) || CONFIG.MIN_GAP_MM);
+      const baseMm = Math.max(CONFIG.MIN_BASE_THICK_MM, parseFloat(srcState.baseThicknessMm) || CONFIG.MIN_BASE_THICK_MM);
+      const recessMm = srcState.isRecessed ? Math.max(1, parseFloat(srcState.recessDepthMm) || 0) : 0;
+      const qty = Math.min(99, Math.max(1, Math.floor(parseFloat(srcState.quantity) || 1)));
 
       const gapCm = gapMm / 10;
       const wallCm = profileMm / 10;
@@ -876,13 +1004,18 @@
       const profileMultiplier = profileMm >= 20 ? 1.20 : 1.0;
       const profileSurchargePercent = profileMm >= 20 ? 20 : 0;
 
-      const woodInfo = CONFIG.WOOD_TYPES[state.wood];
+      const woodInfo = CONFIG.WOOD_TYPES[srcState.wood] || CONFIG.WOOD_TYPES.beech;
       const rawFrameCost = perimeter * woodInfo.price * depthMultiplier * profileMultiplier;
-      const frameCost = Math.ceil(rawFrameCost / 10) * 10;
-      const hangersCost = state.hasHangers
-        ? CONFIG.HANGERS_PRICE + (state.orientation === 'both' ? CONFIG.HANGERS_BOTH_SURCHARGE : 0)
+      const unitFrameCost = Math.ceil(rawFrameCost / 10) * 10;
+      const unitHangersCost = srcState.hasHangers
+        ? CONFIG.HANGERS_PRICE + (srcState.orientation === 'both' ? CONFIG.HANGERS_BOTH_SURCHARGE : 0)
         : 0;
-      const totalCost = frameCost + hangersCost;
+      const unitTotalCost = unitFrameCost + unitHangersCost;
+
+      const frameCost = unitFrameCost * qty;
+      const hangersCost = unitHangersCost * qty;
+      const totalCost = unitTotalCost * qty;
+      const totalPerimeter = perimeter * qty;
 
       return {
         widthCm,
@@ -891,15 +1024,20 @@
         gapMm,
         baseMm,
         recessMm,
+        qty,
         extW,
         extH,
         perimeter,
+        totalPerimeter,
         reqDepth,
         boardHeight,
         surchargePercent,
         profileSurchargePercent,
         isCustomOnly,
         woodInfo,
+        unitFrameCost,
+        unitHangersCost,
+        unitTotalCost,
         frameCost,
         hangersCost,
         totalCost
@@ -1116,17 +1254,367 @@
       }
     }
 
+    function snapshotCurrentFrame() {
+      return {
+        id: 'item_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6),
+        artWidthCm: state.artWidthCm,
+        artHeightCm: state.artHeightCm,
+        wood: state.wood,
+        profileThicknessMm: state.profileThicknessMm,
+        gapMm: state.gapMm,
+        baseThicknessMm: state.baseThicknessMm,
+        isRecessed: state.isRecessed,
+        recessDepthMm: state.recessDepthMm,
+        hasHangers: state.hasHangers,
+        orientation: state.orientation,
+        quantity: Math.min(99, Math.max(1, Math.floor(parseFloat(state.quantity) || 1))),
+        comment: (state.itemComment || '').trim()
+      };
+    }
+
+    function syncAllFormControlsFromState() {
+      const widthInput = document.getElementById('art-width');
+      const heightInput = document.getElementById('art-height');
+      if (widthInput) widthInput.value = state.artWidthCm;
+      if (heightInput) heightInput.value = state.artHeightCm;
+
+      const qtyInput = document.getElementById('frame-qty');
+      if (qtyInput) qtyInput.value = state.quantity;
+
+      const commentInput = document.getElementById('item-comment');
+      if (commentInput) commentInput.value = state.itemComment || '';
+      const commentCounter = document.getElementById('item-comment-counter');
+      if (commentCounter) commentCounter.textContent = `${(state.itemComment || '').length}/120`;
+
+      const gapInput = document.getElementById('gap-size');
+      if (gapInput) gapInput.value = state.gapMm;
+
+      const canvasInput = document.getElementById('canvas-thickness');
+      if (canvasInput) canvasInput.value = state.baseThicknessMm;
+
+      const recessInput = document.getElementById('recess-depth');
+      if (recessInput) recessInput.value = state.recessDepthMm;
+
+      const btnFlush = document.getElementById('fit-flush');
+      const btnRecessed = document.getElementById('fit-recessed');
+      const recessControls = document.getElementById('recess-controls');
+      if (btnFlush) btnFlush.classList.toggle('is-active', !state.isRecessed);
+      if (btnRecessed) btnRecessed.classList.toggle('is-active', Boolean(state.isRecessed));
+      if (recessControls) recessControls.classList.toggle('hidden', !state.isRecessed);
+
+      const btnHangersNo = document.getElementById('hangers-no');
+      const btnHangersYes = document.getElementById('hangers-yes');
+      const hangersDetails = document.getElementById('hangers-details');
+      if (btnHangersNo) btnHangersNo.classList.toggle('is-active', !state.hasHangers);
+      if (btnHangersYes) btnHangersYes.classList.toggle('is-active', Boolean(state.hasHangers));
+      if (hangersDetails) hangersDetails.classList.toggle('hidden', !state.hasHangers);
+
+      const btnOrientVert = document.getElementById('orient-vertical');
+      const btnOrientHoriz = document.getElementById('orient-horizontal');
+      const btnOrientBoth = document.getElementById('orient-both');
+      if (btnOrientVert) btnOrientVert.classList.toggle('is-selected', state.orientation === 'vertical');
+      if (btnOrientHoriz) btnOrientHoriz.classList.toggle('is-selected', state.orientation === 'horizontal');
+      if (btnOrientBoth) btnOrientBoth.classList.toggle('is-selected', state.orientation === 'both');
+
+      syncWoodCardsUI();
+      syncSelectableGroup('.preset-size', 'data-size', `${state.artWidthCm}x${state.artHeightCm}`);
+      syncSelectableGroup('.preset-profile', 'data-profile', state.profileThicknessMm);
+      syncSelectableGroup('.preset-gap', 'data-gap', state.gapMm);
+      syncSelectableGroup('.preset-canvas', 'data-canvas', state.baseThicknessMm);
+      syncSelectableGroup('.preset-recess', 'data-recess', state.recessDepthMm);
+    }
+
+    function addCurrentItemToOrder() {
+      const snap = snapshotCurrentFrame();
+      if (state.editingItemId) {
+        const editIdx = state.orderItems.findIndex((it) => it.id === state.editingItemId);
+        if (editIdx >= 0) {
+          snap.id = state.editingItemId;
+          state.orderItems[editIdx] = snap;
+          saveOrderItemsToStorage();
+          showToast(`Позиция №${editIdx + 1} обновлена`);
+          resetFormToDefaults();
+          render();
+          return;
+        }
+      }
+      state.orderItems.push(snap);
+      saveOrderItemsToStorage();
+      showToast('Позиция добавлена в список заказа');
+      resetFormToDefaults();
+      render();
+    }
+
+    function loadItemIntoForm(itemId) {
+      const idx = state.orderItems.findIndex((it) => it.id === itemId);
+      if (idx < 0) return;
+      const item = state.orderItems[idx];
+
+      state.editingItemId = item.id;
+      state.artWidthCm = Number(item.artWidthCm) || 50;
+      state.artHeightCm = Number(item.artHeightCm) || 70;
+      state.wood = item.wood || 'beech';
+      state.profileThicknessMm = Number(item.profileThicknessMm) || 15;
+      state.gapMm = Number(item.gapMm) || 10;
+      state.baseThicknessMm = Number(item.baseThicknessMm) || 20;
+      state.isRecessed = Boolean(item.isRecessed);
+      state.recessDepthMm = Number(item.recessDepthMm) || 5;
+      state.hasHangers = Boolean(item.hasHangers);
+      state.orientation = item.orientation || 'vertical';
+      state.quantity = Math.min(99, Math.max(1, parseInt(item.quantity, 10) || 1));
+      state.itemComment = item.comment || '';
+
+      syncAllFormControlsFromState();
+      render();
+      showToast(`Позиция №${idx + 1} загружена в форму`);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function duplicateOrderItem(itemId) {
+      const idx = state.orderItems.findIndex((it) => it.id === itemId);
+      if (idx < 0) return;
+      const orig = state.orderItems[idx];
+      const copy = {
+        ...orig,
+        id: 'item_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6)
+      };
+      state.orderItems.splice(idx + 1, 0, copy);
+      saveOrderItemsToStorage();
+      showToast(`Позиция №${idx + 1} продублирована`);
+      render();
+    }
+
+    function resetFormToDefaults() {
+      state.editingItemId = null;
+      state.artWidthCm = 50;
+      state.artHeightCm = 70;
+      state.wood = 'beech';
+      state.profileThicknessMm = 15;
+      state.gapMm = 10;
+      state.baseThicknessMm = 20;
+      state.isRecessed = false;
+      state.recessDepthMm = 5;
+      state.hasHangers = false;
+      state.orientation = 'vertical';
+      state.quantity = 1;
+      state.itemComment = '';
+
+      syncAllFormControlsFromState();
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function removeOrderItem(itemId) {
+      if (state.editingItemId === itemId) {
+        resetFormToDefaults();
+      }
+      state.orderItems = state.orderItems.filter((it) => it.id !== itemId);
+      saveOrderItemsToStorage();
+      render();
+    }
+
+    function clearOrderItems() {
+      if (state.editingItemId) {
+        resetFormToDefaults();
+      }
+      state.orderItems = [];
+      saveOrderItemsToStorage();
+      render();
+    }
+
+    function renderOrderItemsList() {
+      const emptyEl = document.getElementById('order-items-empty');
+      const listEl = document.getElementById('order-items-list');
+      const actionsEl = document.getElementById('order-items-actions');
+      const countEl = document.getElementById('order-items-count-summary');
+      if (!emptyEl || !listEl || !actionsEl || !countEl) return;
+
+      const fmtDim = (val) => Number.isInteger(val) ? val : val.toFixed(1);
+
+      if (!state.orderItems.length) {
+        emptyEl.classList.remove('hidden');
+        listEl.classList.add('hidden');
+        actionsEl.classList.add('hidden');
+        listEl.innerHTML = '';
+        return;
+      }
+
+      emptyEl.classList.add('hidden');
+      listEl.classList.remove('hidden');
+      actionsEl.classList.remove('hidden');
+
+      let totalFramesCount = 0;
+      listEl.innerHTML = state.orderItems.map((item, index) => {
+        const c = calculateFrame(item);
+        totalFramesCount += c.qty;
+        const isEditingThis = state.editingItemId === item.id;
+        const cardBorderCls = isEditingThis
+          ? 'border-amber-500/60 bg-amber-500/10'
+          : 'border-stone-500/20 bg-stone-500/5';
+        const priceStr = c.isCustomOnly
+          ? `Индивидуально (${c.boardHeight} мм)`
+          : `${formatNumber(c.totalCost)} ₽`;
+        const subPriceStr = (!c.isCustomOnly && c.qty > 1)
+          ? ` (${formatNumber(c.unitTotalCost)} ₽/шт)`
+          : '';
+        const orientShort = item.orientation === 'vertical'
+          ? 'вертикально'
+          : item.orientation === 'horizontal'
+            ? 'горизонтально'
+            : 'в оба направления';
+        const hangersStr = item.hasHangers ? ` · скрытые крепления (${orientShort})` : '';
+        const commentHtml = item.comment
+          ? `<div class="text-[11px] italic text-hint break-words pt-0.5">💬 ${escapeHtml(item.comment)}</div>`
+          : '';
+
+        return `
+          <div class="rounded-xl border ${cardBorderCls} p-3 space-y-2 transition-colors">
+            <div class="flex items-start justify-between gap-2">
+              <div class="min-w-0 space-y-0.5">
+                <div class="text-xs font-bold flex flex-wrap items-center gap-1.5">
+                  <span>${index + 1}. ${fmtDim(c.widthCm)} × ${fmtDim(c.heightCm)} см · ${c.woodInfo.name} · ${c.qty} шт.</span>
+                  ${isEditingThis ? `<span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-600">в форме</span>` : ''}
+                </div>
+                <div class="text-[11px] text-hint leading-snug">
+                  Стенка ${c.profileMm} мм · зазор ${c.gapMm} мм · основа ${c.baseMm} мм · борт ${c.boardHeight} мм${hangersStr}
+                </div>
+                ${commentHtml}
+              </div>
+              <div class="flex items-center gap-1 shrink-0">
+                <button type="button" data-edit-id="${item.id}" title="Загрузить позицию в форму для редактирования" aria-label="Редактировать позицию" class="p-1.5 rounded-lg border border-stone-500/25 text-hint hover:text-wood-accent active:scale-95">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </button>
+                <button type="button" data-dup-id="${item.id}" title="Дублировать позицию" aria-label="Дублировать позицию" class="p-1.5 rounded-lg border border-stone-500/25 text-hint hover:text-wood-accent active:scale-95">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                </button>
+                <button type="button" data-remove-id="${item.id}" title="Удалить позицию" aria-label="Удалить позицию" class="p-1.5 rounded-lg text-hint hover:text-rose-500 active:scale-95">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="pt-1.5 border-t border-stone-500/15 flex items-center justify-between gap-2">
+              <div class="text-xs font-semibold text-wood-accent">
+                ${priceStr}<span class="text-[11px] font-normal text-hint">${subPriceStr}</span>
+              </div>
+              <div class="flex items-center gap-1.5 shrink-0">
+                ${item.hasHangers && item.orientation !== 'both' ? `
+                  <button type="button" data-flip-id="${item.id}" title="Дублировать с другой ориентацией креплений" class="px-2 py-1 rounded-lg border border-stone-500/25 text-[10px] font-semibold text-hint hover:text-wood-accent">
+                    ${item.orientation === 'vertical' ? '⇄ Гориз.' : '⇄ Верт.'}
+                  </button>
+                ` : ''}
+                <button type="button" data-qty-dec="${item.id}" aria-label="Уменьшить количество" class="w-7 h-7 rounded-lg selectable-item flex items-center justify-center text-sm font-bold active:scale-95">−</button>
+                <span class="min-w-[2.5rem] text-center text-xs font-bold px-1">${c.qty} шт.</span>
+                <button type="button" data-qty-inc="${item.id}" aria-label="Увеличить количество" class="w-7 h-7 rounded-lg selectable-item flex items-center justify-center text-sm font-bold active:scale-95">+</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      countEl.textContent = `Позиций: ${state.orderItems.length} · Всего рам: ${totalFramesCount} шт.`;
+
+      listEl.querySelectorAll('[data-edit-id]').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          loadItemIntoForm(btn.getAttribute('data-edit-id'));
+        });
+      });
+
+      listEl.querySelectorAll('[data-dup-id]').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          duplicateOrderItem(btn.getAttribute('data-dup-id'));
+        });
+      });
+
+      listEl.querySelectorAll('[data-qty-dec]').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const id = btn.getAttribute('data-qty-dec');
+          const target = state.orderItems.find((it) => it.id === id);
+          if (!target) return;
+          const cur = Math.max(1, parseInt(target.quantity, 10) || 1);
+          if (cur > 1) {
+            target.quantity = cur - 1;
+            saveOrderItemsToStorage();
+            render();
+          }
+        });
+      });
+
+      listEl.querySelectorAll('[data-qty-inc]').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const id = btn.getAttribute('data-qty-inc');
+          const target = state.orderItems.find((it) => it.id === id);
+          if (!target) return;
+          const cur = Math.max(1, parseInt(target.quantity, 10) || 1);
+          target.quantity = Math.min(99, cur + 1);
+          saveOrderItemsToStorage();
+          render();
+        });
+      });
+
+      listEl.querySelectorAll('[data-flip-id]').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const id = btn.getAttribute('data-flip-id');
+          const orig = state.orderItems.find((it) => it.id === id);
+          if (!orig) return;
+          const nextOrient = orig.orientation === 'vertical' ? 'horizontal' : 'vertical';
+          const copy = {
+            ...orig,
+            id: 'item_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6),
+            orientation: nextOrient,
+            quantity: 1
+          };
+          const idx = state.orderItems.findIndex((it) => it.id === id);
+          state.orderItems.splice(idx + 1, 0, copy);
+          saveOrderItemsToStorage();
+          showToast(`Добавлена позиция с ориентацией: ${nextOrient === 'horizontal' ? 'горизонтально' : 'вертикально'}`);
+          render();
+        });
+      });
+
+      listEl.querySelectorAll('[data-remove-id]').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          removeOrderItem(btn.getAttribute('data-remove-id'));
+        });
+      });
+    }
+
     function render() {
-      const calc = calculateFrame();
+      const calc = calculateFrame(state);
 
       document.getElementById('profile-label').textContent = `${calc.profileMm} мм`;
       document.getElementById('gap-label').textContent = `${calc.gapMm} мм`;
       document.getElementById('canvas-thick-label').textContent = `${calc.baseMm} мм`;
       document.getElementById('recess-label').textContent = `${calc.recessMm} мм`;
 
+      const qtyInput = document.getElementById('frame-qty');
+      if (qtyInput && document.activeElement !== qtyInput) {
+        qtyInput.value = calc.qty;
+      }
+
       const fmtDim = (val) => Number.isInteger(val) ? val : val.toFixed(1);
       document.getElementById('outer-dimensions').textContent = `${fmtDim(calc.extW)} × ${fmtDim(calc.extH)} см`;
-      document.getElementById('perimeter-value').textContent = `${calc.perimeter.toFixed(2)} м.п.`;
+      const perimText = calc.qty > 1
+        ? `${calc.totalPerimeter.toFixed(2)} м.п. (${calc.perimeter.toFixed(2)} × ${calc.qty})`
+        : `${calc.perimeter.toFixed(2)} м.п.`;
+      document.getElementById('perimeter-value').textContent = perimText;
 
       const depthBadge = document.getElementById('badge-profile-depth');
       if (calc.isCustomOnly) {
@@ -1140,12 +1628,47 @@
         depthBadge.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 shrink-0';
       }
 
+      const btnAddItem = document.getElementById('btn-add-item');
+      const editBanner = document.getElementById('editing-item-banner');
+      const editLabel = document.getElementById('editing-item-label');
+      const editIdx = state.editingItemId
+        ? state.orderItems.findIndex((it) => it.id === state.editingItemId)
+        : -1;
+
+      if (editIdx >= 0) {
+        if (btnAddItem) btnAddItem.textContent = 'Сохранить изменения';
+        if (editBanner) editBanner.classList.remove('hidden');
+        if (editLabel) editLabel.textContent = `Редактирование позиции №${editIdx + 1}`;
+      } else {
+        if (btnAddItem) btnAddItem.textContent = '+ Добавить раму';
+        if (editBanner) editBanner.classList.add('hidden');
+      }
+
+      renderOrderItemsList();
+
       const validBlock = document.getElementById('price-valid-block');
       const customBlock = document.getElementById('price-custom-block');
       const surchargeBadge = document.getElementById('surcharge-badge');
       const hangersSummary = document.getElementById('hangers-summary');
 
-      if (calc.isCustomOnly) {
+      const hasList = state.orderItems.length > 0;
+      if (hasList) {
+        const listCalcs = state.orderItems.map((it) => calculateFrame(it));
+        const anyCustom = listCalcs.some((c) => c.isCustomOnly);
+        const sumTotal = listCalcs.reduce((acc, c) => acc + (c.isCustomOnly ? 0 : c.totalCost), 0);
+        const sumFrames = listCalcs.reduce((acc, c) => acc + c.qty, 0);
+
+        validBlock.classList.remove('hidden');
+        customBlock.classList.add('hidden');
+
+        document.getElementById('total-price').textContent = anyCustom
+          ? `${formatNumber(sumTotal)} ₽ + инд.`
+          : `${formatNumber(sumTotal)} ₽`;
+        document.getElementById('wood-rate-summary').textContent = `Список: ${state.orderItems.length} поз. · ${sumFrames} шт.`;
+        document.getElementById('depth-summary').textContent = `Текущая: ${formatNumber(calc.totalCost)} ₽ (${calc.qty} шт.)`;
+        surchargeBadge.classList.add('hidden');
+        hangersSummary.classList.add('hidden');
+      } else if (calc.isCustomOnly) {
         validBlock.classList.add('hidden');
         customBlock.classList.remove('hidden');
         document.getElementById('custom-depth-val').textContent = calc.boardHeight;
@@ -1154,7 +1677,9 @@
         customBlock.classList.add('hidden');
         document.getElementById('total-price').textContent = `${formatNumber(calc.totalCost)} ₽`;
         document.getElementById('wood-rate-summary').textContent = `${calc.woodInfo.name} · ${formatNumber(calc.woodInfo.price)} ₽/м.п.`;
-        document.getElementById('depth-summary').textContent = `Профиль ${calc.boardHeight} мм`;
+        document.getElementById('depth-summary').textContent = calc.qty > 1
+          ? `${calc.qty} шт. × ${formatNumber(calc.unitTotalCost)} ₽ · профиль ${calc.boardHeight} мм`
+          : `Профиль ${calc.boardHeight} мм`;
 
         const badges = [];
         if (calc.profileSurchargePercent > 0) badges.push(`+${calc.profileSurchargePercent}% за профиль 20 мм`);
@@ -1168,7 +1693,7 @@
         }
 
         if (state.hasHangers) {
-          hangersSummary.textContent = `+ крепления ${calc.hangersCost} ₽`;
+          hangersSummary.textContent = `+ крепления ${formatNumber(calc.hangersCost)} ₽`;
           hangersSummary.classList.remove('hidden');
         } else {
           hangersSummary.classList.add('hidden');
@@ -1184,7 +1709,7 @@
       }
 
       if (state.hasHangers) {
-        hangersPriceBadge.textContent = `+${calc.hangersCost} ₽`;
+        hangersPriceBadge.textContent = `+${formatNumber(calc.hangersCost)} ₽`;
         hangersPriceBadge.className = 'text-[11px] font-semibold px-2 py-0.5 rounded-md bg-wood-500/15 text-wood-accent';
       } else {
         hangersPriceBadge.textContent = '0 ₽';
@@ -1195,8 +1720,70 @@
       updateHangersSVG(calc.woodInfo);
     }
 
+    function formatSingleItemBlock(calc, itemObj, titlePrefix = '') {
+      const fmtDim = (val) => Number.isInteger(val) ? val : val.toFixed(1);
+      const fitText = calc.recessMm > 0
+        ? `с утоплением на ${calc.recessMm} мм`
+        : `вровень с лицевым краем`;
+
+      const itemOrient = (itemObj && itemObj.orientation) ? itemObj.orientation : state.orientation;
+      const orientLabel = itemOrient === 'vertical'
+        ? 'вертикально (портрет)'
+        : itemOrient === 'horizontal'
+          ? 'горизонтально (альбом)'
+          : 'в оба направления (вертикально и горизонтально)';
+      const hangersLine = calc.unitHangersCost > 0
+        ? `🔩 Крепления: скрытые фрезерованные с двух сторон (+${formatNumber(calc.hangersCost)} ₽), ориентация — ${orientLabel}`
+        : `🔩 Крепления: без креплений`;
+
+      const priceLine = calc.isCustomOnly
+        ? `💰 Стоимость: требуется индивидуальный расчёт (глубина ${calc.boardHeight} мм > 55 мм)`
+        : `💰 Стоимость позиции (${calc.qty} шт.): ${formatNumber(calc.totalCost)} ₽${calc.qty > 1 ? ` (${formatNumber(calc.unitTotalCost)} ₽/шт)` : ''}`;
+
+      const commentText = itemObj && itemObj.comment ? String(itemObj.comment).trim() : '';
+
+      const lines = [];
+      if (titlePrefix) lines.push(titlePrefix);
+      lines.push(
+        `🖼 Размер основы: ${fmtDim(calc.widthCm)} × ${fmtDim(calc.heightCm)} см (толщина ${calc.baseMm} мм) · Кол-во: ${calc.qty} шт.`,
+        `🪵 Порода дерева: ${calc.woodInfo.name} (${formatNumber(calc.woodInfo.price)} ₽/м.п.)`,
+        `📐 Стенка профиля: ${calc.profileMm} мм${calc.profileSurchargePercent > 0 ? ` (+${calc.profileSurchargePercent}%)` : ''} | Зазор: ${calc.gapMm} мм`,
+        `📏 Внешний габарит: ${fmtDim(calc.extW)} × ${fmtDim(calc.extH)} см (периметр ${calc.totalPerimeter.toFixed(2)} м.п.)`,
+        `📥 Посадка: ${fitText} (высота борта ${calc.boardHeight} мм)`,
+        hangersLine
+      );
+      if (commentText) {
+        lines.push(`💬 Комментарий: ${commentText}`);
+      }
+      lines.push(priceLine);
+      return lines.join('\n');
+    }
+
     function buildOrderText() {
-      const calc = calculateFrame();
+      if (state.orderItems.length > 0) {
+        const listCalcs = state.orderItems.map((it) => calculateFrame(it));
+        const anyCustom = listCalcs.some((c) => c.isCustomOnly);
+        const sumTotal = listCalcs.reduce((acc, c) => acc + (c.isCustomOnly ? 0 : c.totalCost), 0);
+        const sumFrames = listCalcs.reduce((acc, c) => acc + c.qty, 0);
+
+        const blocks = state.orderItems.map((it, idx) =>
+          formatSingleItemBlock(listCalcs[idx], it, `--- Позиция ${idx + 1} ---`)
+        );
+
+        const summaryLine = anyCustom
+          ? `💰 Итого по списку (${state.orderItems.length} поз., ${sumFrames} шт.): ${formatNumber(sumTotal)} ₽ + позиции с индивидуальным расчётом`
+          : `💰 Итого по заказу (${state.orderItems.length} поз., ${sumFrames} шт.): ${formatNumber(sumTotal)} ₽`;
+
+        return [
+          `Здравствуйте! Хочу заказать рамы кэнвэс:`,
+          ``,
+          blocks.join('\n\n'),
+          ``,
+          summaryLine
+        ].join('\n');
+      }
+
+      const calc = calculateFrame(state);
       const fmtDim = (val) => Number.isInteger(val) ? val : val.toFixed(1);
       const fitText = calc.recessMm > 0
         ? `с утоплением на ${calc.recessMm} мм`
@@ -1208,26 +1795,29 @@
           ? 'горизонтально (альбом)'
           : 'в оба направления (вертикально и горизонтально)';
       const hangersLine = state.hasHangers
-        ? `🔩 Крепления: скрытые фрезерованные с двух сторон (+${calc.hangersCost} ₽), ориентация — ${orientLabel}`
+        ? `🔩 Крепления: скрытые фрезерованные с двух сторон (+${formatNumber(calc.hangersCost)} ₽), ориентация — ${orientLabel}`
         : `🔩 Крепления: без креплений`;
 
       const priceLine = calc.isCustomOnly
         ? `💰 Стоимость: требуется индивидуальный расчёт (глубина ${calc.boardHeight} мм > 55 мм)`
-        : `💰 Итоговая стоимость: ${formatNumber(calc.totalCost)} ₽ (рама ${formatNumber(calc.frameCost)} ₽${state.hasHangers ? ` + крепления ${calc.hangersCost} ₽` : ''})`;
+        : `💰 Итоговая стоимость (${calc.qty} шт.): ${formatNumber(calc.totalCost)} ₽ (рама ${formatNumber(calc.frameCost)} ₽${state.hasHangers ? ` + крепления ${formatNumber(calc.hangersCost)} ₽` : ''}${calc.qty > 1 ? ` · ${formatNumber(calc.unitTotalCost)} ₽/шт` : ''})`;
 
-      return [
+      const singleComment = (state.itemComment || '').trim();
+      const singleLines = [
         `Здравствуйте! Хочу заказать раму кэнвэс:`,
         ``,
-        `🖼 Размер основы для картины: ${fmtDim(calc.widthCm)} × ${fmtDim(calc.heightCm)} см (толщина ${calc.baseMm} мм)`,
+        `🖼 Размер основы для картины: ${fmtDim(calc.widthCm)} × ${fmtDim(calc.heightCm)} см (толщина ${calc.baseMm} мм) · Кол-во: ${calc.qty} шт.`,
         `🪵 Порода дерева: ${calc.woodInfo.name} (${formatNumber(calc.woodInfo.price)} ₽/м.п.)`,
         `📐 Стенка профиля: ${calc.profileMm} мм${calc.profileSurchargePercent > 0 ? ` (+${calc.profileSurchargePercent}%)` : ''} | Зазор: ${calc.gapMm} мм`,
-        `📏 Внешний габарит рамы: ${fmtDim(calc.extW)} × ${fmtDim(calc.extH)} см (${calc.perimeter.toFixed(2)} м.п.)`,
+        `📏 Внешний габарит рамы: ${fmtDim(calc.extW)} × ${fmtDim(calc.extH)} см (${calc.totalPerimeter.toFixed(2)} м.п.)`,
         `📥 Посадка: ${fitText} (высота борта ${calc.boardHeight} мм)`,
-        hangersLine,
-        `🎨 Покрытие: без покраски (шлифованный массив)`,
-        ``,
-        priceLine
-      ].join('\n');
+        hangersLine
+      ];
+      if (singleComment) {
+        singleLines.push(`💬 Комментарий: ${singleComment}`);
+      }
+      singleLines.push(``, priceLine);
+      return singleLines.join('\n');
     }
 
     function copyToClipboard(text) {
@@ -1535,6 +2125,108 @@
         });
       }
 
+      const termsModal = document.getElementById('terms-modal');
+      const btnOpenTerms = document.getElementById('btn-open-terms');
+      const btnCloseTerms = document.getElementById('terms-close');
+      const btnOkTerms = document.getElementById('terms-ok');
+
+      function openTermsModal(e) {
+        if (e) e.preventDefault();
+        if (!termsModal) return;
+        termsModal.classList.remove('hidden');
+        termsModal.classList.add('flex');
+      }
+
+      function closeTermsModal(e) {
+        if (e) e.preventDefault();
+        if (!termsModal) return;
+        termsModal.classList.add('hidden');
+        termsModal.classList.remove('flex');
+      }
+
+      if (btnOpenTerms) btnOpenTerms.addEventListener('click', openTermsModal);
+      if (btnCloseTerms) btnCloseTerms.addEventListener('click', closeTermsModal);
+      if (btnOkTerms) btnOkTerms.addEventListener('click', closeTermsModal);
+      if (termsModal) {
+        termsModal.addEventListener('click', (e) => {
+          if (e.target === termsModal) closeTermsModal(e);
+        });
+      }
+
+      const qtyMinus = document.getElementById('qty-minus');
+      const qtyPlus = document.getElementById('qty-plus');
+      const qtyInput = document.getElementById('frame-qty');
+
+      if (qtyMinus) {
+        qtyMinus.addEventListener('click', (e) => {
+          e.preventDefault();
+          state.quantity = Math.max(1, (parseInt(state.quantity, 10) || 1) - 1);
+          if (qtyInput) qtyInput.value = state.quantity;
+          render();
+        });
+      }
+
+      if (qtyPlus) {
+        qtyPlus.addEventListener('click', (e) => {
+          e.preventDefault();
+          state.quantity = Math.min(99, (parseInt(state.quantity, 10) || 1) + 1);
+          if (qtyInput) qtyInput.value = state.quantity;
+          render();
+        });
+      }
+
+      if (qtyInput) {
+        qtyInput.addEventListener('input', (e) => {
+          const raw = parseInt(e.target.value, 10);
+          state.quantity = isNaN(raw) ? 1 : Math.min(99, Math.max(1, raw));
+          render();
+        });
+        qtyInput.addEventListener('blur', (e) => {
+          const raw = parseInt(e.target.value, 10);
+          const clamped = isNaN(raw) ? 1 : Math.min(99, Math.max(1, raw));
+          state.quantity = clamped;
+          e.target.value = clamped;
+          render();
+        });
+      }
+
+      const itemCommentInput = document.getElementById('item-comment');
+      const itemCommentCounter = document.getElementById('item-comment-counter');
+      if (itemCommentInput) {
+        itemCommentInput.addEventListener('input', (e) => {
+          state.itemComment = e.target.value;
+          if (itemCommentCounter) {
+            itemCommentCounter.textContent = `${e.target.value.length}/120`;
+          }
+        });
+      }
+
+      const btnAddItem = document.getElementById('btn-add-item');
+      if (btnAddItem) {
+        btnAddItem.addEventListener('click', (e) => {
+          e.preventDefault();
+          addCurrentItemToOrder();
+        });
+      }
+
+      const btnClearItems = document.getElementById('btn-clear-items');
+      if (btnClearItems) {
+        btnClearItems.addEventListener('click', (e) => {
+          e.preventDefault();
+          clearOrderItems();
+        });
+      }
+
+      const btnCancelEdit = document.getElementById('btn-cancel-edit');
+      if (btnCancelEdit) {
+        btnCancelEdit.addEventListener('click', (e) => {
+          e.preventDefault();
+          resetFormToDefaults();
+          render();
+          showToast('Редактирование отменено');
+        });
+      }
+
       document.getElementById('btn-copy').addEventListener('click', (e) => {
         e.preventDefault();
         const orderText = buildOrderText();
@@ -1570,6 +2262,7 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       initTelegram();
+      loadOrderItemsFromStorage();
       bindEvents();
       syncWoodCardsUI();
       syncSelectableGroup('.preset-size', 'data-size', `${state.artWidthCm}x${state.artHeightCm}`);
