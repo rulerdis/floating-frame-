@@ -760,10 +760,18 @@
     };
 
     const ORDER_ITEMS_STORAGE_KEY = 'canvas_calc_order_items_v1';
+    const ORDER_ITEMS_TTL_MS = 24 * 60 * 60 * 1000;
 
     function saveOrderItemsToStorage() {
       try {
-        localStorage.setItem(ORDER_ITEMS_STORAGE_KEY, JSON.stringify(state.orderItems || []));
+        if (!Array.isArray(state.orderItems) || state.orderItems.length === 0) {
+          localStorage.removeItem(ORDER_ITEMS_STORAGE_KEY);
+          return;
+        }
+        localStorage.setItem(ORDER_ITEMS_STORAGE_KEY, JSON.stringify({
+          savedAt: Date.now(),
+          items: state.orderItems
+        }));
       } catch (_) {}
     }
 
@@ -772,9 +780,25 @@
         const raw = localStorage.getItem(ORDER_ITEMS_STORAGE_KEY);
         if (!raw) return;
         const parsed = JSON.parse(raw);
+
+        // Поддержка как нового формата { savedAt, items }, так и старого массива
         if (Array.isArray(parsed)) {
-          state.orderItems = parsed.filter((it) => it && typeof it === 'object' && it.id);
+          localStorage.removeItem(ORDER_ITEMS_STORAGE_KEY);
+          return;
         }
+
+        if (!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.items)) {
+          return;
+        }
+
+        const savedAt = Number(parsed.savedAt) || 0;
+        if (!savedAt || (Date.now() - savedAt) > ORDER_ITEMS_TTL_MS) {
+          localStorage.removeItem(ORDER_ITEMS_STORAGE_KEY);
+          state.orderItems = [];
+          return;
+        }
+
+        state.orderItems = parsed.items.filter((it) => it && typeof it === 'object' && it.id);
       } catch (_) {}
     }
 
@@ -2241,6 +2265,10 @@
 
         sendSilentLog('Нажата кнопка «Отправить мастеру»', orderText);
         copyToClipboard(orderText);
+
+        if (state.orderItems.length > 0) {
+          clearOrderItems();
+        }
 
         if (MASTER_USERNAME && MASTER_USERNAME !== 'your_username') {
           const tgUrl = `https://t.me/${MASTER_USERNAME}?text=${encodedText}`;
