@@ -1689,7 +1689,9 @@
           ? `${formatNumber(sumTotal)} ₽ + инд.`
           : `${formatNumber(sumTotal)} ₽`;
         document.getElementById('wood-rate-summary').textContent = `Список: ${state.orderItems.length} поз. · ${sumFrames} шт.`;
-        document.getElementById('depth-summary').textContent = `Текущая: ${formatNumber(calc.totalCost)} ₽ (${calc.qty} шт.)`;
+        document.getElementById('depth-summary').textContent = anyCustom
+          ? 'Есть позиции с инд. расчётом'
+          : 'К отправке в расчёте';
         surchargeBadge.classList.add('hidden');
         hangersSummary.classList.add('hidden');
       } else if (calc.isCustomOnly) {
