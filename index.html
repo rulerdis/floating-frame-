@@ -307,6 +307,10 @@
         <span class="text-[11px] font-medium px-2 py-0.5 rounded-md bg-stone-500/10 text-hint">в сантиметрах</span>
       </div>
 
+      <p class="text-[11px] leading-snug text-hint">
+        Укажите размер вашего холста или подрамника — нужный припуск на посадку мы учтём автоматически.
+      </p>
+
       <div class="grid grid-cols-2 gap-3">
         <div>
           <label for="art-width" class="block text-xs text-hint mb-1">Ширина основы, см</label>
@@ -348,104 +352,12 @@
           <button id="qty-plus" type="button" aria-label="Увеличить количество" class="w-9 h-9 rounded-xl selectable-item flex items-center justify-center text-base font-bold active:scale-95">+</button>
         </div>
       </div>
-
     </section>
 
-    <!-- 3. Профиль и технологический зазор -->
-    <section class="card-surface rounded-2xl p-4 shadow-sm space-y-4">
-      <h2 class="text-sm font-semibold">3. Профиль и технологический зазор</h2>
-
-      <!-- Толщина стенки профиля -->
-      <div>
-        <div class="flex items-center justify-between mb-1.5">
-          <span class="text-xs text-hint">Толщина стенки профиля (лицевая грань)</span>
-          <span class="text-xs font-semibold text-wood-accent" id="profile-label">15 мм</span>
-        </div>
-        <div class="grid grid-cols-3 gap-2">
-          <button type="button" data-profile="10" class="preset-profile selectable-item py-2 rounded-xl text-xs font-semibold">10 мм</button>
-          <button type="button" data-profile="15" class="preset-profile selectable-item is-selected py-2 rounded-xl text-xs font-semibold">15 мм</button>
-          <button type="button" data-profile="20" class="preset-profile selectable-item py-2 rounded-xl text-xs font-semibold">20 мм (+20%)</button>
-        </div>
-      </div>
-
-      <!-- Технологический зазор (минимум 3 мм) -->
-      <div>
-        <div class="flex items-center justify-between mb-1.5">
-          <label for="gap-size" class="text-xs text-hint">Зазор между рамой и основой (3–20 мм)</label>
-          <span class="text-xs font-semibold text-wood-accent" id="gap-label">10 мм</span>
-        </div>
-        <div class="grid grid-cols-4 gap-2">
-          <button type="button" data-gap="3" class="preset-gap selectable-item py-2 rounded-xl text-xs font-semibold">3 мм</button>
-          <button type="button" data-gap="5" class="preset-gap selectable-item py-2 rounded-xl text-xs font-semibold">5 мм</button>
-          <button type="button" data-gap="10" class="preset-gap selectable-item is-selected py-2 rounded-xl text-xs font-semibold">10 мм</button>
-          <input id="gap-size" type="number" inputmode="numeric" min="3" max="20" value="10" aria-label="Свой зазор в мм"
-            class="w-full rounded-xl border px-2 py-1.5 text-center text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-wood-500" />
-        </div>
-
-        <!-- Пояснение про минимальный зазор 3 мм -->
-        <p class="mt-2 text-[11px] leading-snug text-hint bg-stone-500/10 rounded-xl px-3 py-2">
-          Минимальный зазор — <strong>3 мм</strong> на сторону. Он необходим для компенсации температурного расширения/сужения натурального дерева и погрешности замеров, чтобы основа гарантированно вошла в раму.
-        </p>
-      </div>
-    </section>
-
-    <!-- 4. Толщина основы для картины и посадка по глубине -->
-    <section class="card-surface rounded-2xl p-4 shadow-sm space-y-4">
-      <h2 class="text-sm font-semibold">4. Толщина основы для картины и посадка по глубине</h2>
-
-      <!-- Толщина основы (минимум 15 мм) -->
-      <div>
-        <div class="flex items-center justify-between mb-1.5">
-          <label for="canvas-thickness" class="text-xs text-hint">Толщина основы (холст / артборд)</label>
-          <span class="text-xs font-semibold text-wood-accent shrink-0 ml-2" id="canvas-thick-label">20 мм</span>
-        </div>
-        <div class="grid grid-cols-4 gap-2">
-          <button type="button" data-canvas="15" class="preset-canvas selectable-item py-2 px-1 rounded-xl text-[11px] font-semibold leading-tight">Тонкий<br><span class="text-hint font-normal">15 мм</span></button>
-          <button type="button" data-canvas="20" class="preset-canvas selectable-item is-selected py-2 px-1 rounded-xl text-[11px] font-semibold leading-tight">Стандарт<br><span class="opacity-80 font-normal">20 мм</span></button>
-          <button type="button" data-canvas="35" class="preset-canvas selectable-item py-2 px-1 rounded-xl text-[11px] font-semibold leading-tight">Глубокий<br><span class="text-hint font-normal">35 мм</span></button>
-          <input id="canvas-thickness" type="number" inputmode="numeric" min="15" max="50" value="20" aria-label="Своя толщина основы в мм"
-            class="w-full rounded-xl border px-2 py-1.5 text-center text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-wood-500" />
-        </div>
-
-        <!-- Информационное предупреждение про тонкие борды от 6 мм -->
-        <div class="mt-2 text-[11px] leading-snug text-hint bg-stone-500/10 rounded-xl px-3 py-2">
-          Для бордов без подрамника саморезы не применяются — они пробьют основу насквозь. Заказы на рамы для такой основы обсуждаются индивидуально.
-        </div>
-      </div>
-
-      <!-- Положение работы относительно края рамы -->
-      <div>
-        <span class="block text-xs text-hint mb-1.5">Положение работы относительно края рамы</span>
-        <div class="grid grid-cols-2 gap-2 p-1 rounded-xl bg-stone-500/10">
-          <button type="button" id="fit-flush" class="seg-btn is-active py-2 px-3 rounded-lg text-xs font-semibold">
-            Вровень с краем
-          </button>
-          <button type="button" id="fit-recessed" class="seg-btn py-2 px-3 rounded-lg text-xs font-semibold">
-            Утопить внутрь
-          </button>
-        </div>
-
-        <!-- Глубина утопления -->
-        <div id="recess-controls" class="hidden mt-3 pt-3 border-t border-stone-500/15">
-          <div class="flex items-center justify-between mb-1.5">
-            <label for="recess-depth" class="text-xs text-hint">На сколько утопить основу внутрь (для объёма)</label>
-            <span class="text-xs font-semibold text-wood-accent" id="recess-label">5 мм</span>
-          </div>
-          <div class="grid grid-cols-4 gap-2">
-            <button type="button" data-recess="5" class="preset-recess selectable-item is-selected py-2 rounded-xl text-xs font-semibold">5 мм</button>
-            <button type="button" data-recess="10" class="preset-recess selectable-item py-2 rounded-xl text-xs font-semibold">10 мм</button>
-            <button type="button" data-recess="15" class="preset-recess selectable-item py-2 rounded-xl text-xs font-semibold">15 мм</button>
-            <input id="recess-depth" type="number" inputmode="numeric" min="1" max="30" value="5" aria-label="Своя глубина утопления в мм"
-              class="w-full rounded-xl border px-2 py-1.5 text-center text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-wood-500" />
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 5. Фрезерованные крепления на стену -->
+    <!-- 3. Фрезерованные крепления на стену -->
     <section class="card-surface rounded-2xl p-4 shadow-sm space-y-3">
       <div class="flex items-center justify-between">
-        <h2 class="text-sm font-semibold">5. Фрезерованные скрытые крепления</h2>
+        <h2 class="text-sm font-semibold">3. Скрытые крепления на стену</h2>
         <span id="hangers-price-badge" class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-stone-500/10 text-hint">0 ₽</span>
       </div>
 
@@ -545,60 +457,176 @@
       </div>
     </section>
 
-    <!-- 6. Схема посадки в профиль (разрез) -->
-    <section class="card-surface rounded-2xl p-4 shadow-sm space-y-3">
-      <div class="flex items-center justify-between gap-2">
-        <h2 class="text-sm font-semibold">Схема посадки в профиль (разрез)</h2>
-        <span id="badge-profile-depth" class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 shrink-0">
-          Высота борта: 40 мм (стандарт)
-        </span>
-      </div>
-
-      <div class="w-full rounded-xl bg-stone-500/5 border border-stone-500/15 p-3 flex flex-col items-center">
-        <svg id="cross-section-svg" viewBox="0 0 320 158" class="w-full max-w-[320px] h-auto overflow-visible">
-          <line id="svg-face-line" x1="30" y1="24" x2="290" y2="24" stroke="#a8a29e" stroke-width="1" stroke-dasharray="4 3" />
-          <text x="290" y="19" text-anchor="end" font-size="9" fill="#78716c">Лицевая плоскость рамы</text>
-
-          <line id="svg-rear-edge-line" x1="42" y1="120" x2="270" y2="120" stroke="#a8a29e" stroke-width="1" stroke-dasharray="3 3" />
-
-          <rect id="svg-wall" x="52" y="24" width="24" height="96" rx="2" fill="#c59e6f" stroke="#7f5433" stroke-width="1.2" />
-
-          <rect id="svg-canvas" x="92" y="24" width="148" height="48" rx="2" fill="#e7e5e4" stroke="#57534e" stroke-width="1.2" />
-          <text id="svg-canvas-label" x="166" y="51" text-anchor="middle" font-size="11" font-weight="600" fill="#292524">Основа 20 мм</text>
-
-          <line id="svg-contact-line" x1="76" y1="73" x2="240" y2="73" stroke="#1c1917" stroke-width="2" />
-
-          <rect id="svg-back" x="76" y="74" width="164" height="19" rx="2" fill="#b5844f" stroke="#7f5433" stroke-width="1.2" />
-          <text id="svg-back-label" x="158" y="86.5" text-anchor="middle" font-size="9" font-weight="600" fill="#ffffff">Задняя стенка 8 мм</text>
-
-          <text id="svg-rear-space-label" x="158" y="110" text-anchor="middle" font-size="8.5" fill="#78716c" opacity="1">
-            Свободное пространство сзади
-          </text>
-
-          <g id="svg-recess-group" opacity="0">
-            <line id="svg-recess-line" x1="112" y1="24" x2="112" y2="36" stroke="#dc2626" stroke-width="1.5" />
-            <text id="svg-recess-text" x="118" y="33" font-size="9.5" font-weight="700" fill="#dc2626">Утопление 5 мм</text>
-          </g>
-
-          <line id="svg-gap-line" x1="76" y1="42" x2="92" y2="42" stroke="#0284c7" stroke-width="1.5" />
-          <text id="svg-gap-text" x="84" y="36" text-anchor="middle" font-size="9" font-weight="700" fill="#0284c7">10 мм</text>
-
-          <text id="svg-wall-text" x="64" y="135" text-anchor="middle" font-size="9.5" font-weight="600" fill="#78716c">Стенка 15 мм</text>
-
-          <line x1="262" y1="24" x2="262" y2="120" stroke="#78716c" stroke-width="1.2" />
-          <line x1="257" y1="24" x2="267" y2="24" stroke="#78716c" stroke-width="1.2" />
-          <line x1="257" y1="120" x2="267" y2="120" stroke="#78716c" stroke-width="1.2" />
-          <text id="svg-total-depth-text" x="272" y="75" font-size="10" font-weight="700" fill="#78716c">40 мм</text>
-        </svg>
-
-        <div class="w-full grid grid-cols-2 gap-2 pt-2.5 mt-1 border-t border-stone-500/15 text-xs">
-          <div class="flex flex-col">
-            <span class="text-hint text-[11px]">Внешний габарит рамы:</span>
-            <span id="outer-dimensions" class="font-bold text-sm">55.0 × 75.0 см</span>
+    <!-- Дополнительные технические настройки (свёрнуты по умолчанию) -->
+    <section class="card-surface rounded-2xl shadow-sm overflow-hidden">
+      <button id="btn-toggle-advanced" type="button" aria-expanded="false" class="w-full p-4 flex items-center justify-between gap-3 text-left hover:opacity-90 transition">
+        <div class="min-w-0 space-y-0.5">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-semibold">Тонкие настройки профиля и зазора</span>
+            <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-600 shrink-0">оптимум</span>
           </div>
-          <div class="flex flex-col text-right">
-            <span class="text-hint text-[11px]">Расход багета (периметр):</span>
-            <span id="perimeter-value" class="font-bold text-sm">2.60 м.п.</span>
+          <p id="advanced-summary-line" class="text-[11px] text-hint truncate">
+            Стенка 15 мм · зазор 10 мм · основа 20 мм · вровень с краем
+          </p>
+        </div>
+        <div class="flex items-center gap-1.5 shrink-0 text-xs font-semibold text-wood-accent">
+          <span id="advanced-toggle-label">Изменить</span>
+          <svg id="advanced-chevron" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+      </button>
+
+      <div id="advanced-panel" class="hidden px-4 pb-4 pt-2 border-t border-stone-500/15 space-y-5">
+        <p class="text-[11px] leading-snug text-hint bg-stone-500/10 rounded-xl px-3 py-2">
+          Если не уверены в миллиметрах — оставьте значения по умолчанию. Они подходят для большинства стандартных холстов на подрамнике и проверяются мастером перед запуском.
+        </p>
+
+        <!-- Профиль и технологический зазор -->
+        <div class="space-y-3.5">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-hint">Профиль и зазор</h3>
+
+          <!-- Толщина стенки профиля -->
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-xs text-hint">Толщина стенки профиля (лицевая грань)</span>
+              <span class="text-xs font-semibold text-wood-accent" id="profile-label">15 мм</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+              <button type="button" data-profile="10" class="preset-profile selectable-item py-2 rounded-xl text-xs font-semibold">10 мм</button>
+              <button type="button" data-profile="15" class="preset-profile selectable-item is-selected py-2 rounded-xl text-xs font-semibold">15 мм</button>
+              <button type="button" data-profile="20" class="preset-profile selectable-item py-2 rounded-xl text-xs font-semibold">20 мм (+20%)</button>
+            </div>
+          </div>
+
+          <!-- Технологический зазор (минимум 3 мм) -->
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <label for="gap-size" class="text-xs text-hint">Зазор между рамой и основой (3–20 мм)</label>
+              <span class="text-xs font-semibold text-wood-accent" id="gap-label">10 мм</span>
+            </div>
+            <div class="grid grid-cols-4 gap-2">
+              <button type="button" data-gap="3" class="preset-gap selectable-item py-2 rounded-xl text-xs font-semibold">3 мм</button>
+              <button type="button" data-gap="5" class="preset-gap selectable-item py-2 rounded-xl text-xs font-semibold">5 мм</button>
+              <button type="button" data-gap="10" class="preset-gap selectable-item is-selected py-2 rounded-xl text-xs font-semibold">10 мм</button>
+              <input id="gap-size" type="number" inputmode="numeric" min="3" max="20" value="10" aria-label="Свой зазор в мм"
+                class="w-full rounded-xl border px-2 py-1.5 text-center text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-wood-500" />
+            </div>
+
+            <p class="mt-2 text-[11px] leading-snug text-hint bg-stone-500/10 rounded-xl px-3 py-2">
+              Минимальный зазор — <strong>3 мм</strong> на сторону. Он нужен для компенсации расширения натурального дерева и погрешности замеров, чтобы основа гарантированно вошла в раму.
+            </p>
+          </div>
+        </div>
+
+        <!-- Толщина основы и посадка по глубине -->
+        <div class="pt-4 border-t border-stone-500/15 space-y-3.5">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-hint">Толщина основы и посадка</h3>
+
+          <!-- Толщина основы (минимум 15 мм) -->
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <label for="canvas-thickness" class="text-xs text-hint">Толщина основы (холст / артборд)</label>
+              <span class="text-xs font-semibold text-wood-accent shrink-0 ml-2" id="canvas-thick-label">20 мм</span>
+            </div>
+            <div class="grid grid-cols-4 gap-2">
+              <button type="button" data-canvas="15" class="preset-canvas selectable-item py-2 px-1 rounded-xl text-[11px] font-semibold leading-tight">Тонкий<br><span class="text-hint font-normal">15 мм</span></button>
+              <button type="button" data-canvas="20" class="preset-canvas selectable-item is-selected py-2 px-1 rounded-xl text-[11px] font-semibold leading-tight">Стандарт<br><span class="opacity-80 font-normal">20 мм</span></button>
+              <button type="button" data-canvas="35" class="preset-canvas selectable-item py-2 px-1 rounded-xl text-[11px] font-semibold leading-tight">Глубокий<br><span class="text-hint font-normal">35 мм</span></button>
+              <input id="canvas-thickness" type="number" inputmode="numeric" min="15" max="50" value="20" aria-label="Своя толщина основы в мм"
+                class="w-full rounded-xl border px-2 py-1.5 text-center text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-wood-500" />
+            </div>
+
+            <div class="mt-2 text-[11px] leading-snug text-hint bg-stone-500/10 rounded-xl px-3 py-2">
+              Для бордов без подрамника саморезы не применяются — они пробьют основу насквозь. Заказы на рамы для такой основы обсуждаются индивидуально.
+            </div>
+          </div>
+
+          <!-- Положение работы относительно края рамы -->
+          <div>
+            <span class="block text-xs text-hint mb-1.5">Положение работы относительно края рамы</span>
+            <div class="grid grid-cols-2 gap-2 p-1 rounded-xl bg-stone-500/10">
+              <button type="button" id="fit-flush" class="seg-btn is-active py-2 px-3 rounded-lg text-xs font-semibold">
+                Вровень с краем
+              </button>
+              <button type="button" id="fit-recessed" class="seg-btn py-2 px-3 rounded-lg text-xs font-semibold">
+                Утопить внутрь
+              </button>
+            </div>
+
+            <!-- Глубина утопления -->
+            <div id="recess-controls" class="hidden mt-3 pt-3 border-t border-stone-500/15">
+              <div class="flex items-center justify-between mb-1.5">
+                <label for="recess-depth" class="text-xs text-hint">На сколько утопить основу внутрь (для объёма)</label>
+                <span class="text-xs font-semibold text-wood-accent" id="recess-label">5 мм</span>
+              </div>
+              <div class="grid grid-cols-4 gap-2">
+                <button type="button" data-recess="5" class="preset-recess selectable-item is-selected py-2 rounded-xl text-xs font-semibold">5 мм</button>
+                <button type="button" data-recess="10" class="preset-recess selectable-item py-2 rounded-xl text-xs font-semibold">10 мм</button>
+                <button type="button" data-recess="15" class="preset-recess selectable-item py-2 rounded-xl text-xs font-semibold">15 мм</button>
+                <input id="recess-depth" type="number" inputmode="numeric" min="1" max="30" value="5" aria-label="Своя глубина утопления в мм"
+                  class="w-full rounded-xl border px-2 py-1.5 text-center text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-wood-500" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Схема посадки в профиль (разрез) -->
+        <div class="pt-4 border-t border-stone-500/15 space-y-2.5">
+          <div class="flex items-center justify-between gap-2">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-hint">Схема посадки (разрез)</h3>
+            <span id="badge-profile-depth" class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 shrink-0">
+              Высота борта: 40 мм (стандарт)
+            </span>
+          </div>
+
+          <div class="w-full rounded-xl bg-stone-500/5 border border-stone-500/15 p-3 flex flex-col items-center">
+            <svg id="cross-section-svg" viewBox="0 0 320 158" class="w-full max-w-[320px] h-auto overflow-visible">
+              <line id="svg-face-line" x1="30" y1="24" x2="290" y2="24" stroke="#a8a29e" stroke-width="1" stroke-dasharray="4 3" />
+              <text x="290" y="19" text-anchor="end" font-size="9" fill="#78716c">Лицевая плоскость рамы</text>
+
+              <line id="svg-rear-edge-line" x1="42" y1="120" x2="270" y2="120" stroke="#a8a29e" stroke-width="1" stroke-dasharray="3 3" />
+
+              <rect id="svg-wall" x="52" y="24" width="24" height="96" rx="2" fill="#c59e6f" stroke="#7f5433" stroke-width="1.2" />
+
+              <rect id="svg-canvas" x="92" y="24" width="148" height="48" rx="2" fill="#e7e5e4" stroke="#57534e" stroke-width="1.2" />
+              <text id="svg-canvas-label" x="166" y="51" text-anchor="middle" font-size="11" font-weight="600" fill="#292524">Основа 20 мм</text>
+
+              <line id="svg-contact-line" x1="76" y1="73" x2="240" y2="73" stroke="#1c1917" stroke-width="2" />
+
+              <rect id="svg-back" x="76" y="74" width="164" height="19" rx="2" fill="#b5844f" stroke="#7f5433" stroke-width="1.2" />
+              <text id="svg-back-label" x="158" y="86.5" text-anchor="middle" font-size="9" font-weight="600" fill="#ffffff">Задняя стенка 8 мм</text>
+
+              <text id="svg-rear-space-label" x="158" y="110" text-anchor="middle" font-size="8.5" fill="#78716c" opacity="1">
+                Свободное пространство сзади
+              </text>
+
+              <g id="svg-recess-group" opacity="0">
+                <line id="svg-recess-line" x1="112" y1="24" x2="112" y2="36" stroke="#dc2626" stroke-width="1.5" />
+                <text id="svg-recess-text" x="118" y="33" font-size="9.5" font-weight="700" fill="#dc2626">Утопление 5 мм</text>
+              </g>
+
+              <line id="svg-gap-line" x1="76" y1="42" x2="92" y2="42" stroke="#0284c7" stroke-width="1.5" />
+              <text id="svg-gap-text" x="84" y="36" text-anchor="middle" font-size="9" font-weight="700" fill="#0284c7">10 мм</text>
+
+              <text id="svg-wall-text" x="64" y="135" text-anchor="middle" font-size="9.5" font-weight="600" fill="#78716c">Стенка 15 мм</text>
+
+              <line x1="262" y1="24" x2="262" y2="120" stroke="#78716c" stroke-width="1.2" />
+              <line x1="257" y1="24" x2="267" y2="24" stroke="#78716c" stroke-width="1.2" />
+              <line x1="257" y1="120" x2="267" y2="120" stroke="#78716c" stroke-width="1.2" />
+              <text id="svg-total-depth-text" x="272" y="75" font-size="10" font-weight="700" fill="#78716c">40 мм</text>
+            </svg>
+
+            <div class="w-full grid grid-cols-2 gap-2 pt-2.5 mt-1 border-t border-stone-500/15 text-xs">
+              <div class="flex flex-col">
+                <span class="text-hint text-[11px]">Внешний габарит рамы:</span>
+                <span id="outer-dimensions" class="font-bold text-sm">55.0 × 75.0 см</span>
+              </div>
+              <div class="flex flex-col text-right">
+                <span class="text-hint text-[11px]">Расход багета (периметр):</span>
+                <span id="perimeter-value" class="font-bold text-sm">2.60 м.п.</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -686,7 +714,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         <div class="space-y-1">
-          <p>Рама поставляется без покраски (шлифованный массив, готовый под любое покрытие). Расчёт предварительный, уточняется при заказе.</p>
+          <p>Не переживайте, если в чём-то сомневаетесь — расчёт предварительный, при согласовании мастер проверит все параметры под вашу основу. Рама поставляется без покраски (шлифованный массив).</p>
           <div class="flex flex-wrap items-center gap-x-3 gap-y-1 pt-0.5">
             <button id="btn-open-privacy" type="button" class="underline text-wood-accent hover:opacity-80 font-medium">
               Политика конфиденциальности
@@ -756,6 +784,7 @@
       itemComment: '',
       orderItems: [],
       editingItemId: null,
+      advancedExpanded: false,
       manualTheme: null // null | 'dark' | 'light'
     };
 
@@ -1388,6 +1417,16 @@
       state.quantity = Math.min(99, Math.max(1, parseInt(item.quantity, 10) || 1));
       state.itemComment = item.comment || '';
 
+      const hasCustomAdv = (
+        state.profileThicknessMm !== 15 ||
+        state.gapMm !== 10 ||
+        state.baseThicknessMm !== 20 ||
+        state.isRecessed
+      );
+      if (hasCustomAdv && !state.advancedExpanded) {
+        setAdvancedExpanded(true);
+      }
+
       syncAllFormControlsFromState();
       render();
       showToast(`Позиция №${idx + 1} загружена в форму`);
@@ -1639,6 +1678,12 @@
         ? `${calc.totalPerimeter.toFixed(2)} м.п. (${calc.perimeter.toFixed(2)} × ${calc.qty})`
         : `${calc.perimeter.toFixed(2)} м.п.`;
       document.getElementById('perimeter-value').textContent = perimText;
+
+      const advSummary = document.getElementById('advanced-summary-line');
+      if (advSummary) {
+        const fitShort = calc.recessMm > 0 ? `утопление ${calc.recessMm} мм` : 'вровень с краем';
+        advSummary.textContent = `Стенка ${calc.profileMm} мм · зазор ${calc.gapMm} мм · основа ${calc.baseMm} мм · ${fitShort}`;
+      }
 
       const depthBadge = document.getElementById('badge-profile-depth');
       if (calc.isCustomOnly) {
@@ -1902,7 +1947,27 @@
       });
     }
 
+    function setAdvancedExpanded(expanded) {
+      state.advancedExpanded = Boolean(expanded);
+      const panel = document.getElementById('advanced-panel');
+      const chevron = document.getElementById('advanced-chevron');
+      const toggleLabel = document.getElementById('advanced-toggle-label');
+      const toggleBtn = document.getElementById('btn-toggle-advanced');
+      if (panel) panel.classList.toggle('hidden', !state.advancedExpanded);
+      if (chevron) chevron.classList.toggle('rotate-180', state.advancedExpanded);
+      if (toggleLabel) toggleLabel.textContent = state.advancedExpanded ? 'Свернуть' : 'Изменить';
+      if (toggleBtn) toggleBtn.setAttribute('aria-expanded', state.advancedExpanded ? 'true' : 'false');
+    }
+
     function bindEvents() {
+      const btnToggleAdvanced = document.getElementById('btn-toggle-advanced');
+      if (btnToggleAdvanced) {
+        btnToggleAdvanced.addEventListener('click', (e) => {
+          e.preventDefault();
+          setAdvancedExpanded(!state.advancedExpanded);
+        });
+      }
+
       const themeToggle = document.getElementById('theme-toggle');
       if (themeToggle) {
         themeToggle.addEventListener('click', (e) => {
